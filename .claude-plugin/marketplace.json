@@ -1,0 +1,18 @@
+{
+  "name": "d-market-knowledge",
+  "owner": {
+    "name": "DIO0550"
+  },
+  "metadata": {
+    "description": "Claude Code Skills Marketplace",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "market-knowledge",
+      "source": "./plugins/market-knowledge",
+      "version": "1.0.0",
+      "description": "d-market関連の知識・ナレッジをまとめるプラグイン。"
+    }
+  ]
+}
