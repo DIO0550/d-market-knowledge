@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【タイトル】_クイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,700&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+JP:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-page:#f4f7fb;
+    --bg-surface:#ffffff;
+    --bg-subtle:#eaf0f7;
+    --ink-primary:#1a2332;
+    --ink-secondary:#3e4a5e;
+    --ink-muted:#6b7a8f;
+    --rule:#cfd9e6;
+    --rule-strong:#a8b5c7;
+    --accent:#2c5aa0;
+    --accent-2:#4a7ec4;
+    --accent-soft:#dde8f5;
+    --accent-ink:#1e3f73;
+    --info:#2c5aa0;
+    --info-soft:#dde8f5;
+    --warn:#a06a1c;
+    --warn-soft:#faecd0;
+    --ok:#2d7a5f;
+    --ok-soft:#d8ebe2;
+    --danger:#a33a3a;
+    --danger-soft:#f5dede;
+    --code-bg:#eef3f9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Source Serif 4","Noto Serif JP",Georgia,serif;
+    background:var(--bg-page);color:var(--ink-primary);
+    line-height:1.75;font-size:16px;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(rgba(44,90,160,.05) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
+
+  .container{
+    max-width:780px;margin:0 auto;
+    padding:3rem 2rem 5rem;
+    position:relative;z-index:1;
+  }
+
+  .progress{
+    position:fixed;top:0;left:0;height:2px;
+    background:var(--accent);width:0%;z-index:100;
+    transition:width .2s;
+  }
+
+  /* ===== Header ===== */
+  header{
+    margin-bottom:2.5rem;padding-bottom:1.75rem;
+    border-bottom:1px solid var(--rule);
+  }
+  .back-link{
+    display:inline-flex;align-items:center;gap:.35rem;
+    font-family:"JetBrains Mono",monospace;
+    font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink-muted);text-decoration:none;
+    margin-bottom:1rem;
+    transition:color .2s ease;
+  }
+  .back-link:hover{color:var(--accent)}
+  .back-link::before{content:"←";margin-right:.15rem}
+  .eyebrow{
+    font-family:"JetBrains Mono",monospace;
+    font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.75rem;
+  }
+  h1{
+    font-size:2rem;font-weight:700;line-height:1.3;
+    margin-bottom:.5rem;letter-spacing:-.01em;
+    text-wrap:balance;
+  }
+  .subtitle{
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    font-size:.92rem;color:var(--ink-secondary);
+  }
+  .score-display{
+    display:inline-flex;align-items:center;gap:.5rem;
+    margin-top:1.25rem;padding:.55rem 1.1rem;
+    background:var(--bg-surface);
+    border:1px solid var(--rule);
+    border-radius:3px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:.8rem;color:var(--ink-secondary);
+  }
+  .score-display .score-label{color:var(--ink-muted);letter-spacing:.05em}
+  .score-display .score-value{color:var(--accent);font-weight:700}
+
+  /* ===== Question card ===== */
+  /* [インタラクション #4] 判定フラッシュ */
+  .question-card{
+    background:var(--bg-surface);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:1.75rem 1.9rem;
+    margin-bottom:1.25rem;
+    transition:border-color .25s ease;
+  }
+  .question-card.correct-answered{
+    border-color:var(--ok);border-left:3px solid var(--ok);
+    animation:flash-correct .6s ease-out;
+  }
+  .question-card.incorrect-answered{
+    border-color:var(--danger);border-left:3px solid var(--danger);
+    animation:flash-incorrect .6s ease-out;
+  }
+
+  @keyframes flash-correct{
+    0%{background:var(--bg-surface)}
+    30%{background:var(--ok-soft)}
+    100%{background:var(--bg-surface)}
+  }
+  @keyframes flash-incorrect{
+    0%{background:var(--bg-surface)}
+    30%{background:var(--danger-soft)}
+    100%{background:var(--bg-surface)}
+  }
+
+  .question-header{
+    display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+  }
+  .question-number{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:40px;height:28px;padding:0 .7rem;
+    background:var(--accent);color:#fff;
+    font-family:"JetBrains Mono",monospace;
+    font-size:.78rem;font-weight:700;letter-spacing:.05em;
+    border-radius:2px;flex-shrink:0;
+    transition:background-color .25s ease;
+  }
+  .question-card.correct-answered .question-number{background:var(--ok)}
+  .question-card.incorrect-answered .question-number{background:var(--danger)}
+  .question-type{
+    font-family:"JetBrains Mono",monospace;
+    font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+    padding:.22rem .55rem;border-radius:2px;
+    background:var(--bg-subtle);color:var(--ink-muted);
+  }
+  .question-text{
+    font-size:1.06rem;font-weight:500;
+    color:var(--ink-primary);line-height:1.7;
+    margin-bottom:1.25rem;
+    font-family:"Source Serif 4","Noto Serif JP",serif;
+  }
+
+  /* ===== Multiple choice options ===== */
+  .options-container{
+    display:flex;flex-direction:column;gap:.5rem;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+  }
+  .option{
+    display:flex;align-items:center;gap:.8rem;
+    padding:.8rem 1rem;
+    background:var(--bg-surface);
+    border:1.5px solid var(--rule);
+    border-radius:3px;cursor:pointer;
+    transition:border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease;
+    text-align:left;width:100%;
+    color:var(--ink-secondary);font-size:.93rem;
+    font-family:inherit;
+  }
+  .option:hover:not(.disabled){
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    color:var(--ink-primary);
+    transform:translateX(2px);
+  }
+  .option-label{
+    display:flex;align-items:center;justify-content:center;
+    width:26px;height:26px;
+    background:var(--bg-subtle);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    font-family:"JetBrains Mono",monospace;
+    font-weight:700;font-size:.78rem;
+    color:var(--ink-secondary);flex-shrink:0;
+  }
+  .option-text{flex:1}
+  .option.correct{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+  .option.correct .option-label{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .option.incorrect{border-color:var(--danger);background:var(--danger-soft);color:var(--danger)}
+  .option.incorrect .option-label{background:var(--danger);color:#fff;border-color:var(--danger)}
+  .option.disabled{pointer-events:none}
+  .option.disabled:not(.correct):not(.incorrect){opacity:.5}
+
+  /* ===== YES/NO ===== */
+  .options-container.yesno{flex-direction:row;gap:.6rem}
+  .yesno-option{flex:1;justify-content:center;padding:1rem;font-weight:600}
+  .yesno-icon{
+    font-family:"JetBrains Mono",monospace;
+    font-size:1.1rem;font-weight:700;margin-right:.4rem;
+  }
+  .yesno-option[data-value="yes"] .yesno-icon{color:var(--ok)}
+  .yesno-option[data-value="no"] .yesno-icon{color:var(--accent)}
+  @media(max-width:480px){.options-container.yesno{flex-direction:column}}
+
+  /* ===== Sort (drag-and-drop reorder) ===== */
+  .sort-header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:.6rem;padding:.45rem .75rem;
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent);
+    border-radius:2px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:600;
+  }
+  .sort-header::before{content:"⋮⋮ ";margin-right:.3rem;color:var(--accent)}
+  .shuffle-btn{
+    background:transparent;border:1px solid var(--rule);
+    padding:.25rem .6rem;border-radius:2px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:.65rem;letter-spacing:.12em;
+    color:var(--ink-secondary);cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .shuffle-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  .shuffle-btn:disabled{opacity:.3;cursor:not-allowed}
+  .sort-list{
+    display:flex;flex-direction:column;gap:.4rem;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+  }
+
+  /* [インタラクション #5] sort-item ドラッグ感 */
+  .sort-item{
+    display:flex;align-items:center;gap:.8rem;
+    padding:.75rem 1rem;
+    background:var(--bg-surface);
+    border:1.5px solid var(--rule);
+    border-radius:3px;cursor:grab;
+    color:var(--ink-secondary);font-size:.92rem;
+    user-select:none;
+    transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .sort-item:hover:not(.locked){border-color:var(--accent)}
+  .sort-item.dragging{
+    opacity:.55;cursor:grabbing;
+    transform:rotate(.5deg) scale(1.02);
+    box-shadow:0 6px 16px rgba(44,90,160,.18);
+    border-color:var(--accent);
+  }
+  .sort-item.drop-before{box-shadow:0 -2px 0 var(--accent)}
+  .sort-item.drop-after{box-shadow:0 2px 0 var(--accent)}
+  .sort-item.locked{cursor:default}
+  .sort-num{
+    width:26px;height:26px;border-radius:2px;
+    background:var(--bg-subtle);border:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"JetBrains Mono",monospace;
+    font-size:.78rem;font-weight:700;
+    color:var(--ink-secondary);flex-shrink:0;
+  }
+  .sort-handle{
+    margin-left:auto;color:var(--ink-muted);
+    font-size:.95rem;letter-spacing:.05em;
+  }
+  .sort-item.correct{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+  .sort-item.correct .sort-num{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .sort-item.wrong{border-color:var(--danger);background:var(--danger-soft);color:var(--danger)}
+  .sort-item.wrong .sort-num{background:var(--danger);color:#fff;border-color:var(--danger)}
+
+  .sort-correct-ref{
+    margin-top:1rem;padding:.9rem 1.1rem;
+    background:var(--ok-soft);
+    border:1px solid var(--ok);
+    border-left:3px solid var(--ok);
+    border-radius:3px;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+  }
+  .sort-correct-ref-head{
+    font-family:"JetBrains Mono",monospace;
+    font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ok);font-weight:700;
+    margin-bottom:.6rem;
+  }
+  .sort-correct-ref-head::before{content:"✓ ";margin-right:.25rem;font-size:.85rem}
+  .sort-ref-list{display:flex;flex-direction:column;gap:.35rem}
+  .sort-ref-item{
+    display:flex;align-items:center;gap:.7rem;
+    padding:.55rem .8rem;
+    background:var(--bg-surface);
+    border:1px solid rgba(45,122,95,.25);
+    border-radius:2px;
+    color:var(--ink-primary);
+    font-size:.88rem;
+  }
+  .sort-ref-num{
+    width:24px;height:24px;border-radius:2px;
+    background:var(--ok);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"JetBrains Mono",monospace;
+    font-weight:700;font-size:.75rem;
+    flex-shrink:0;
+  }
+
+  .sort-submit{margin-top:.9rem;display:flex;justify-content:flex-end}
+  .sort-submit button{
+    padding:.5rem 1.1rem;
+    background:var(--ink-primary);color:#fff;
+    border:none;border-radius:2px;cursor:pointer;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    font-size:.82rem;font-weight:500;
+    transition:background-color .15s ease;
+  }
+  .sort-submit button:hover{background:var(--accent)}
+
+  /* ===== Feedback ===== */
+  .feedback{
+    margin-top:1rem;padding:.95rem 1.1rem;
+    border-radius:3px;display:none;gap:.85rem;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    animation:fadeIn .3s ease-out;
+    border-left:3px solid;
+  }
+  .feedback.show{display:flex}
+  .feedback.correct{background:var(--ok-soft);border-left-color:var(--ok)}
+  .feedback.incorrect{background:var(--danger-soft);border-left-color:var(--danger)}
+  .feedback-icon{display:none}
+  .feedback-content{flex:1}
+  .feedback-title{font-weight:700;font-size:.88rem;margin-bottom:.2rem}
+  .feedback.correct .feedback-title{color:var(--ok)}
+  .feedback.incorrect .feedback-title{color:var(--danger)}
+  .feedback-explanation{color:var(--ink-secondary);font-size:.87rem;line-height:1.7}
+
+  /* ===== Submit section ===== */
+  .submit-section{
+    text-align:center;margin-top:2rem;padding-top:2rem;
+    border-top:1px solid var(--rule);
+    font-family:"Inter","Noto Sans JP",sans-serif;
+  }
+  .submit-btn{
+    padding:.8rem 2.5rem;
+    background:var(--accent);color:#fff;
+    border:none;border-radius:3px;cursor:pointer;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    font-size:.95rem;font-weight:600;letter-spacing:.02em;
+    transition:background-color .2s ease;
+  }
+  .submit-btn:hover:not(:disabled){background:var(--accent-ink)}
+  .submit-btn:disabled{background:var(--rule-strong);cursor:not-allowed;opacity:.7}
+  .submit-hint{
+    margin-top:.65rem;font-size:.82rem;
+    color:var(--ink-muted);
+  }
+
+  /* ===== Result ===== */
+  .result-section{
+    display:none;margin-top:2rem;
+    padding:2.5rem 2rem;text-align:center;
+    background:var(--bg-surface);
+    border:1px solid var(--rule);
+    border-top:3px solid var(--accent);
+    border-radius:4px;
+    animation:fadeIn .4s ease-out;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+  }
+  .result-section.show{display:block}
+  .result-eyebrow{
+    font-family:"JetBrains Mono",monospace;
+    font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.5rem;
+  }
+  .result-title{
+    font-family:"Source Serif 4","Noto Serif JP",serif;
+    font-size:1.4rem;font-weight:700;
+    margin-bottom:1.25rem;color:var(--ink-primary);
+  }
+  .result-score{
+    display:inline-flex;align-items:baseline;gap:.25rem;
+    margin-bottom:.35rem;
+    font-family:"JetBrains Mono",monospace;
+  }
+  .result-score .score-number{
+    font-size:3rem;font-weight:700;color:var(--accent);
+  }
+  .result-score .score-divider{font-size:1.5rem;color:var(--rule-strong);margin:0 .3rem}
+  .result-score .score-total{font-size:1.5rem;color:var(--ink-secondary)}
+  .result-percentage{
+    font-size:.95rem;color:var(--ink-secondary);margin-bottom:1.25rem;
+  }
+  .result-breakdown{
+    display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));
+    gap:.5rem;
+    margin:1.25rem auto;max-width:480px;
+  }
+  .bd{
+    padding:.7rem .85rem;background:var(--bg-subtle);
+    border:1px solid var(--rule);border-radius:3px;text-align:left;
+  }
+  .bd-name{
+    font-family:"JetBrains Mono",monospace;
+    font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink-muted);margin-bottom:.15rem;
+  }
+  .bd-value{
+    font-family:"JetBrains Mono",monospace;
+    font-size:1rem;font-weight:700;color:var(--ink-primary);
+  }
+  .result-message{
+    padding:.85rem 1rem;margin:0 auto 1.5rem;
+    background:var(--bg-subtle);border:1px solid var(--rule);
+    border-radius:3px;max-width:460px;
+    font-size:.88rem;color:var(--ink-secondary);
+  }
+  .result-actions{
+    display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;
+  }
+  .btn{
+    padding:.65rem 1.5rem;border-radius:3px;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    font-size:.88rem;font-weight:500;
+    cursor:pointer;text-decoration:none;
+    transition:background-color .2s ease, color .2s ease, border-color .2s ease;
+    display:inline-block;border:1.5px solid;
+  }
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn-primary:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+  .btn-ghost{background:transparent;color:var(--ink-secondary);border-color:var(--rule)}
+  .btn-ghost:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* ===== Scroll-to-top ===== */
+  .scroll-top-btn{
+    position:fixed;bottom:1.5rem;right:1.5rem;
+    width:42px;height:42px;
+    background:var(--accent);color:#fff;
+    border:none;border-radius:3px;cursor:pointer;
+    font-size:1.1rem;
+    opacity:0;visibility:hidden;
+    transition:opacity .3s ease, visibility .3s ease, background-color .2s ease;
+    z-index:100;
+    box-shadow:0 2px 8px rgba(44,90,160,.25);
+  }
+  .scroll-top-btn.show{opacity:1;visibility:visible}
+  .scroll-top-btn:hover{background:var(--accent-ink)}
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  @media(max-width:640px){
+    .container{padding:2rem 1.25rem 4rem}
+    .question-card{padding:1.25rem}
+    h1{font-size:1.5rem}
+    .result-breakdown{grid-template-columns:1fr}
+  }
+
+  /* ===== Reduced motion ===== */
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after{
+      animation-duration:.01ms!important;
+      animation-iteration-count:1!important;
+      transition-duration:.01ms!important;
+      scroll-behavior:auto!important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="container">
+
+  <header>
+    <a class="back-link" href="【解説HTMLファイル名】.html">Back to notes</a>
+    <div class="eyebrow">Self-Check Quiz</div>
+    <h1>理解度チェック</h1>
+    <p class="subtitle">【元資料タイトル】 · 全N問</p>
+    <div class="score-display">
+      <span class="score-label">ANSWERED</span>
+      <span class="score-value" id="answered-count">0</span>
+      <span class="score-label">/ <span id="total-count">0</span></span>
+    </div>
+  </header>
+
+  <main id="quiz-container"></main>
+
+  <div class="submit-section" id="submit-section">
+    <button class="submit-btn" id="submit-btn" onclick="showResults()" disabled>結果を見る</button>
+    <p class="submit-hint" id="submit-hint">すべての問題に回答してください</p>
+  </div>
+
+  <div class="result-section" id="result-section">
+    <div class="result-eyebrow">Final Score</div>
+    <h2 class="result-title" id="result-title">お疲れさまでした</h2>
+    <div class="result-score">
+      <span class="score-number" id="final-score">0</span>
+      <span class="score-divider">/</span>
+      <span class="score-total" id="result-total">0</span>
+    </div>
+    <p class="result-percentage" id="result-percentage">正答率: 0%</p>
+    <div class="result-breakdown" id="result-breakdown"></div>
+    <p class="result-message" id="result-message"></p>
+    <div class="result-actions">
+      <button class="btn btn-primary" onclick="retryQuiz()">もう一度挑戦</button>
+      <a class="btn btn-ghost" href="【解説HTMLファイル名】.html">解説を見る</a>
+    </div>
+  </div>
+</div>
+
+<button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()" aria-label="最上部へ">↑</button>
+
+<script>
+/* ============================================================
+ * クイズデータ定義
+ *
+ * 【厳守】type は以下の3種類のみ。他の名前は動作しない:
+ *   - 'multiple' : 4択 (options配列, correct=正解のindex 0〜3)
+ *   - 'yesno'    : 2択 (correct='yes' or 'no')
+ *   - 'sort'     : 並べ替え (items配列を正解順で定義、表示時に自動シャッフル)
+ *
+ * ❌ 使ってはいけないtype名:
+ *   'rank', 'order', 'ranking', 'sequence', 'reorder' など
+ *   → 並べ替え問題は必ず 'sort' を使う
+ *
+ * 【sort型の書き方】
+ *   items は必ず文字列の配列にする（オブジェクトはNG）
+ *   items は「正解の順序」で定義する。表示時はコード側で自動シャッフル
+ *   correct / correct_order プロパティは書かない（itemsの順序が正解）
+ *
+ * ❌ よくある間違い:
+ *   type: 'rank'                              → 'sort' に
+ *   items: [{id:'a', text:'項目A'}]           → 文字列だけに
+ *   correct_order: ['a', 'b']                 → プロパティごと削除
+ * ============================================================ */
+const quizData = [
+  {
+    type:'multiple',
+    question:'【4択の問題文】',
+    options:['【選択肢A】','【選択肢B】','【選択肢C】','【選択肢D】'],
+    correct:0,
+    explanation:'【解説文】'
+  },
+  {
+    type:'yesno',
+    question:'【YES/NO問題文】',
+    correct:'yes',
+    explanation:'【解説文】'
+  },
+  {
+    type:'sort',
+    question:'【並べ替え問題文（手順・順序・重要度などを並べる）】',
+    items:[
+      '【ステップ1：正解順で記述・文字列のみ】',
+      '【ステップ2：正解順で記述・文字列のみ】',
+      '【ステップ3：正解順で記述・文字列のみ】',
+      '【ステップ4：正解順で記述・文字列のみ】'
+    ],
+    // correct プロパティは書かない。itemsの並びそのものが正解判定の基準
+    explanation:'【解説文】'
+  }
+];
+
+const answers = new Array(quizData.length).fill(null);
+const sortOrders = quizData.map(q => q.type==='sort' ? shuffled(q.items.length) : null);
+let answeredCount = 0;
+
+function shuffled(n){
+  const arr=[...Array(n).keys()];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// 問題タイプごとのカウント（結果画面のbreakdown用）
+function countByType(){
+  const counts={multiple:0, yesno:0, sort:0};
+  quizData.forEach(q=>{ counts[q.type]++; });
+  return counts;
+}
+
+function initQuiz(){
+  answers.fill(null);
+  answeredCount=0;
+  quizData.forEach((q,i)=>{ if(q.type==='sort') sortOrders[i]=shuffled(q.items.length); });
+
+  document.getElementById('total-count').textContent=quizData.length;
+  document.getElementById('result-total').textContent=quizData.length;
+
+  // breakdownを動的生成
+  const counts=countByType();
+  const bdEl=document.getElementById('result-breakdown');
+  const labels={multiple:'4択', yesno:'YES/NO', sort:'並べ替え'};
+  bdEl.innerHTML='';
+  Object.keys(counts).forEach(type=>{
+    if(counts[type]>0){
+      bdEl.innerHTML += `<div class="bd"><div class="bd-name">${labels[type]}</div><div class="bd-value" id="bd-${type}">0 / ${counts[type]}</div></div>`;
+    }
+  });
+
+  document.getElementById('result-section').classList.remove('show');
+  document.getElementById('submit-section').style.display='block';
+  renderAll();
+  updateAnsweredCount();
+}
+
+function renderAll(){
+  const c=document.getElementById('quiz-container');
+  let html='';
+  quizData.forEach((q,idx)=>{
+    const typeLabel = q.type==='yesno'?'YES/NO' : q.type==='sort'?'SORT':'MULTIPLE CHOICE';
+    html += `
+      <div class="question-card" id="question-${idx}">
+        <div class="question-header">
+          <div class="question-number">Q${String(idx+1).padStart(2,'0')}</div>
+          <span class="question-type">${typeLabel}</span>
+        </div>
+        <p class="question-text">${q.question}</p>
+        <div id="body-${idx}"></div>
+        <div class="feedback" id="feedback-${idx}">
+          <div class="feedback-icon"></div>
+          <div class="feedback-content">
+            <div class="feedback-title"></div>
+            <p class="feedback-explanation"></p>
+          </div>
+        </div>
+      </div>`;
+  });
+  c.innerHTML=html;
+  quizData.forEach((q,idx)=>{
+    const body=document.getElementById(`body-${idx}`);
+    if(q.type==='yesno') renderYN(body,q,idx);
+    else if(q.type==='sort') renderSort(body,q,idx);
+    else renderMC(body,q,idx);
+  });
+}
+
+function renderMC(body,q,idx){
+  const labels=['A','B','C','D'];
+  let html=`<div class="options-container" id="options-${idx}">`;
+  q.options.forEach((opt,i)=>{
+    html += `<button class="option" data-index="${i}" onclick="selectAnswer(${idx},${i})">
+      <span class="option-label">${labels[i]}</span>
+      <span class="option-text">${opt}</span></button>`;
+  });
+  html += `</div>`;
+  body.innerHTML=html;
+}
+
+function renderYN(body,q,idx){
+  body.innerHTML = `
+    <div class="options-container yesno" id="options-${idx}">
+      <button class="option yesno-option" data-value="yes" onclick="selectAnswer(${idx},'yes')">
+        <span class="yesno-icon">○</span><span class="option-text">はい (YES)</span>
+      </button>
+      <button class="option yesno-option" data-value="no" onclick="selectAnswer(${idx},'no')">
+        <span class="yesno-icon">×</span><span class="option-text">いいえ (NO)</span>
+      </button>
+    </div>`;
+}
+
+function renderSort(body,q,idx){
+  const locked = answers[idx]!==null;
+  const isWrong = locked && answers[idx]==='wrong';
+  const head=`<div class="sort-header"><span>DRAG TO REORDER</span>
+    <button class="shuffle-btn" ${locked?'disabled':''} onclick="shuffleSort(${idx})">shuffle</button></div>`;
+  let items=`<div class="sort-list" id="sort-list-${idx}">`;
+  sortOrders[idx].forEach((origIdx,pos)=>{
+    let cls='sort-item';
+    if(locked){
+      cls += ' locked ' + (origIdx===pos?'correct':'wrong');
+    }
+    items += `<div class="${cls}" draggable="${!locked}" data-pos="${pos}" data-qi="${idx}">
+      <div class="sort-num">${pos+1}</div>
+      <div>${q.items[origIdx]}</div>
+      <div class="sort-handle">⋮⋮</div></div>`;
+  });
+  items += `</div>`;
+
+  let correctRef = '';
+  if(isWrong){
+    let refItems = '';
+    q.items.forEach((txt,pos)=>{
+      refItems += `<div class="sort-ref-item">
+        <div class="sort-ref-num">${pos+1}</div>
+        <div>${txt}</div></div>`;
+    });
+    correctRef = `<div class="sort-correct-ref">
+      <div class="sort-correct-ref-head">正解の順序</div>
+      <div class="sort-ref-list">${refItems}</div>
+    </div>`;
+  }
+
+  const submit = locked ? '' :
+    `<div class="sort-submit"><button onclick="submitSort(${idx})">この順で回答する</button></div>`;
+  body.innerHTML = head + items + correctRef + submit;
+  if(!locked) attachDnD(idx);
+}
+
+function shuffleSort(idx){
+  sortOrders[idx]=shuffled(sortOrders[idx].length);
+  const body=document.getElementById(`body-${idx}`);
+  renderSort(body,quizData[idx],idx);
+}
+
+function submitSort(idx){
+  const correct = sortOrders[idx].every((v,p)=>v===p);
+  answers[idx] = correct ? 'correct' : 'wrong';
+  answeredCount++;
+  updateAnsweredCount();
+  const card=document.getElementById(`question-${idx}`);
+  card.classList.add(correct?'correct-answered':'incorrect-answered');
+  const body=document.getElementById(`body-${idx}`);
+  renderSort(body,quizData[idx],idx);
+  showFeedback(idx,correct,quizData[idx].explanation);
+  checkAllAnswered();
+}
+
+function attachDnD(qi){
+  document.querySelectorAll(`#sort-list-${qi} .sort-item`).forEach(el=>{
+    el.addEventListener('dragstart',e=>{
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',el.dataset.pos);
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      document.querySelectorAll('.sort-item').forEach(x=>x.classList.remove('drop-before','drop-after'));
+    });
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const r=el.getBoundingClientRect();
+      const before=(e.clientY-r.top)<r.height/2;
+      document.querySelectorAll(`#sort-list-${qi} .sort-item`).forEach(x=>x.classList.remove('drop-before','drop-after'));
+      el.classList.add(before?'drop-before':'drop-after');
+    });
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      const from=+e.dataTransfer.getData('text/plain');
+      let to=+el.dataset.pos;
+      const r=el.getBoundingClientRect();
+      const before=(e.clientY-r.top)<r.height/2;
+      if(!before) to++;
+      const arr=sortOrders[qi];
+      const [moved]=arr.splice(from,1);
+      if(from<to) to--;
+      arr.splice(to,0,moved);
+      const body=document.getElementById(`body-${qi}`);
+      renderSort(body,quizData[qi],qi);
+    });
+
+    // Touch events for mobile
+    let touchY=0;
+    el.addEventListener('touchstart',e=>{
+      touchY=e.touches[0].clientY;
+      el.classList.add('dragging');
+    },{passive:true});
+    el.addEventListener('touchmove',e=>{
+      touchY=e.touches[0].clientY;
+      const t=document.elementFromPoint(e.touches[0].clientX,touchY);
+      const it=t?t.closest('.sort-item'):null;
+      document.querySelectorAll(`#sort-list-${qi} .sort-item`).forEach(x=>x.classList.remove('drop-before','drop-after'));
+      if(it && it!==el){
+        const r=it.getBoundingClientRect();
+        const before=(touchY-r.top)<r.height/2;
+        it.classList.add(before?'drop-before':'drop-after');
+      }
+    },{passive:true});
+    el.addEventListener('touchend',e=>{
+      el.classList.remove('dragging');
+      const t=document.elementFromPoint(e.changedTouches[0].clientX,touchY);
+      const it=t?t.closest('.sort-item'):null;
+      if(it && it!==el){
+        const from=+el.dataset.pos;
+        let to=+it.dataset.pos;
+        const r=it.getBoundingClientRect();
+        const before=(touchY-r.top)<r.height/2;
+        if(!before) to++;
+        const arr=sortOrders[qi];
+        const [moved]=arr.splice(from,1);
+        if(from<to) to--;
+        arr.splice(to,0,moved);
+        const body=document.getElementById(`body-${qi}`);
+        renderSort(body,quizData[qi],qi);
+      }else{
+        document.querySelectorAll('.sort-item').forEach(x=>x.classList.remove('drop-before','drop-after'));
+      }
+    });
+  });
+}
+
+function selectAnswer(qi,ans){
+  const q=quizData[qi];
+  if(answers[qi]!==null) return;
+  answers[qi]=ans;
+  answeredCount++;
+  updateAnsweredCount();
+  const isCorrect = ans===q.correct;
+  const card=document.getElementById(`question-${qi}`);
+  card.classList.add(isCorrect?'correct-answered':'incorrect-answered');
+  const optsEl=document.getElementById(`options-${qi}`);
+  optsEl.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  if(q.type==='yesno'){
+    const sel=optsEl.querySelector(`.option[data-value="${ans}"]`);
+    sel.classList.add(isCorrect?'correct':'incorrect');
+    if(!isCorrect) optsEl.querySelector(`.option[data-value="${q.correct}"]`).classList.add('correct');
+  }else{
+    const sel=optsEl.querySelector(`.option[data-index="${ans}"]`);
+    sel.classList.add(isCorrect?'correct':'incorrect');
+    if(!isCorrect) optsEl.querySelector(`.option[data-index="${q.correct}"]`).classList.add('correct');
+  }
+  showFeedback(qi,isCorrect,q.explanation);
+  checkAllAnswered();
+}
+
+function showFeedback(qi,ok,explanation){
+  const fb=document.getElementById(`feedback-${qi}`);
+  fb.className=`feedback show ${ok?'correct':'incorrect'}`;
+  fb.querySelector('.feedback-title').textContent = ok?'正解':'不正解';
+  fb.querySelector('.feedback-explanation').textContent = explanation;
+}
+
+function updateAnsweredCount(){
+  document.getElementById('answered-count').textContent = answeredCount;
+}
+
+function checkAllAnswered(){
+  const btn=document.getElementById('submit-btn');
+  const hint=document.getElementById('submit-hint');
+  if(answeredCount===quizData.length){
+    btn.disabled=false;
+    hint.textContent='準備完了 — 結果を確認しましょう';
+  }else{
+    btn.disabled=true;
+    hint.textContent=`残り ${quizData.length-answeredCount} 問`;
+  }
+}
+
+function isCorrect(i){
+  const q=quizData[i];
+  if(q.type==='sort') return answers[i]==='correct';
+  return answers[i]===q.correct;
+}
+
+/* [インタラクション #6] スコアカウントアップ */
+function animateCount(el, target, duration){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced || target===0){
+    el.textContent = target;
+    return;
+  }
+  const start = performance.now();
+  const step = (now)=>{
+    const t = Math.min((now-start)/duration, 1);
+    // easeOutQuad
+    const eased = 1 - (1-t)*(1-t);
+    el.textContent = Math.round(eased*target);
+    if(t<1) requestAnimationFrame(step);
+    else el.textContent = target;
+  };
+  requestAnimationFrame(step);
+}
+
+function showResults(){
+  let score=0;
+  const counts=countByType();
+  const correctByType={multiple:0, yesno:0, sort:0};
+  quizData.forEach((q,i)=>{
+    if(isCorrect(i)){ score++; correctByType[q.type]++; }
+  });
+  const pct=Math.round((score/quizData.length)*100);
+  let title,message;
+  if(pct===100){title='完璧!';message='全問正解。内容は完全に把握できています。'}
+  else if(pct>=80){title='よく理解できています';message='間違えた問題の解説を読み直せば完璧に。'}
+  else if(pct>=60){title='基本はOK';message='もう少し復習してから再挑戦してみましょう。'}
+  else{title='要復習';message='解説に戻ってから再挑戦をおすすめします。'}
+
+  document.getElementById('result-percentage').textContent=`正答率: ${pct}%`;
+  document.getElementById('result-title').textContent=title;
+  document.getElementById('result-message').textContent=message;
+
+  // breakdownの各値を更新
+  Object.keys(counts).forEach(type=>{
+    if(counts[type]>0){
+      const el=document.getElementById(`bd-${type}`);
+      if(el) el.textContent = `${correctByType[type]} / ${counts[type]}`;
+    }
+  });
+
+  document.getElementById('submit-section').style.display='none';
+  const res=document.getElementById('result-section');
+  res.classList.add('show');
+
+  // スコア数字をカウントアップ
+  const scoreEl=document.getElementById('final-score');
+  scoreEl.textContent='0';
+  setTimeout(()=>animateCount(scoreEl, score, 800), 100);
+
+  setTimeout(()=>{
+    const y=res.getBoundingClientRect().top+window.scrollY-40;
+    window.scrollTo({top:y,behavior:'smooth'});
+  },50);
+}
+
+function retryQuiz(){
+  scrollToTop();
+  setTimeout(initQuiz,300);
+}
+
+function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
+
+window.addEventListener('scroll',()=>{
+  const btn=document.getElementById('scroll-top-btn');
+  btn.classList.toggle('show', window.scrollY>400);
+  const h=document.documentElement;
+  const scrolled=h.scrollTop/(h.scrollHeight-h.clientHeight);
+  document.getElementById('progress').style.width=(scrolled*100)+'%';
+},{passive:true});
+
+document.addEventListener('DOMContentLoaded',initQuiz);
+</script>
+</body>
+</html>
