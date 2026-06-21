@@ -3,10 +3,9 @@ name: knowledge-issue
 description: "gh コマンドで dev-knowledge リポジトリ（dio0550/dev-knowledge）に GitHub Issue を作成するスキル。2つの使い方がある:(A) knowledge-article で作ったナレッジ記事を「記事化済みとして」issue に登録する、(B) 開発中に疑問に思った設計・気づき・調べたいことを、記事化せずそのまま issue として起票する。「issueに作って」「issue化」「ghでissue立てて」「これissueにしといて」「あとで調べたい」「設計の疑問をissueに」「register knowledge issue」などのキーワードでトリガー。"
 ---
 
-# Knowledge Issue
+# ナレッジを dev-knowledge の issue として起票する
 
-`gh` コマンドで `dio0550/dev-knowledge` に GitHub Issue を作成するスキル。
-「ナレッジとして残したいこと」を issue として起票する手順を提供する。
+「まとまった記事」も「開発中にふと湧いた疑問」も、`gh` で `dio0550/dev-knowledge` の issue に落とし込む。記事化の前後どちらの段階でも知見を取りこぼさないための受け口。
 
 ---
 
