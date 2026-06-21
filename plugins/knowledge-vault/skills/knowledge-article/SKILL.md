@@ -17,10 +17,10 @@ description: "技術ナレッジを、frontmatter（title / tags）＋「問題 
 
 ## 出力形式
 
-| 形式 | いつ使うか | フォーマット |
+| 形式 | いつ使うか | テンプレート |
 |---|---|---|
 | **Markdown（既定）** | 指定が無いときは常にこちら | [references/article-format.md](references/article-format.md) |
-| **HTML（オプション）** | ユーザーが「HTML で」と明示したときだけ | [references/article-format-html.md](references/article-format-html.md) |
+| **HTML（オプション）** | ユーザーが「HTML で」と明示したときだけ | [references/article-format.html](references/article-format.html) |
 
 - どちらの形式でも**中身のルール（1記事1トピック / tags 必須 / 日本語 / 最小コード）は同一**。構成（TL;DR → 問題 → 原因 → 解決 → まとめ）も揃える。
 - HTML でも `tags` は `<meta name="keywords">` に必ず残す（横断検索の手がかりを失わないため）。
@@ -32,6 +32,6 @@ description: "技術ナレッジを、frontmatter（title / tags）＋「問題 
 - 日本語で書く。コードは最小再現に絞る。
 - 整理しすぎて書くのをやめるより、粗くてもまず残す。
 
-**フォーマット詳細（frontmatter・本文テンプレート）**:
+**テンプレート（`<…>` を差し替えて使う）**:
 - Markdown（既定）: [references/article-format.md](references/article-format.md)
-- HTML（オプション）: [references/article-format-html.md](references/article-format-html.md)
+- HTML（オプション）: [references/article-format.html](references/article-format.html)
