@@ -1,0 +1,9 @@
+{
+  "name": "knowledge-vault",
+  "version": "1.0.0",
+  "description": "d-market関連の知識・ナレッジをまとめるプラグイン。",
+  "author": {
+    "name": "DIO0550"
+  },
+  "skills": "./skills"
+}
