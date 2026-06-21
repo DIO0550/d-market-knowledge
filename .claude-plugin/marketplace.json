@@ -11,8 +11,8 @@
     {
       "name": "knowledge-vault",
       "source": "./plugins/knowledge-vault",
-      "version": "1.0.0",
-      "description": "d-market関連の知識・ナレッジをまとめるプラグイン。"
+      "version": "1.1.0",
+      "description": "d-market関連の知識・ナレッジをまとめるプラグイン。dev-knowledgeフォーマットのナレッジ記事を作成するknowledge-articleと、その記事をghでdev-knowledgeのGitHub Issueに登録するknowledge-issueを提供する。"
     }
   ]
 }
