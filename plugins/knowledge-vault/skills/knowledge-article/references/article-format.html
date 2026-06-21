@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--
+  dev-knowledge ナレッジ記事テンプレート（HTML 版・オプション）
+
+  - 基本は Markdown（article-format.md）。ユーザーが「HTML で」と明示したときだけ使う。
+  - 構成は md 版と同一: タグ → タイトル → TL;DR → 遭遇した問題 → 原因 → 解決 → まとめ・参考。
+  - 中身のルールも md 版と同じ（1記事1トピック / tags 必須 / 日本語 / 最小コード）。
+  - <…> の箇所を差し替えて使う。
+  - アクセント色は :root の --accent を変える。プリセット: #2563eb（青）/ #0d9488（teal）/ #d97757（橙）/ #7c3aed（紫）
+  - 不要なら .meta（メタ情報）/ .toc（目次）のブロックは丸ごと削除してよい。
+-->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- title / tags は横断検索の手がかり。必ず残す -->
+  <title><タイトル></title>
+  <meta name="keywords" content="<tag1>, <tag2>, <tag3>">
+  <meta name="description" content="<一行サマリ>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent: #2563eb; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    .page { min-height: 100vh; background: #eceef1; padding: 48px 20px; color: #3f4a5a;
+            font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif; }
+    .card { max-width: 812px; margin: 0 auto; background: #fff; border: 1px solid #e9ebef;
+            border-radius: 18px; box-shadow: 0 6px 30px rgba(15,23,42,.07); padding: 56px 60px 60px; }
+
+    code { font-family: 'JetBrains Mono', monospace; font-size: .86em; background: #f1f5f9;
+           color: #0f172a; padding: 2px 6px; border-radius: 5px; }
+
+    /* タグ */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px;
+           font-size: 12.5px; font-weight: 600; letter-spacing: .01em; color: var(--accent);
+           background: color-mix(in srgb, var(--accent) 9%, #fff);
+           border: 1px solid color-mix(in srgb, var(--accent) 20%, #fff); }
+    .tag .hash { opacity: .5; margin-right: 2px; }
+
+    /* 見出し */
+    .title { margin: 20px 0 0; font-size: 33px; line-height: 1.42; font-weight: 700;
+             color: #0f172a; letter-spacing: -.01em; text-wrap: balance; }
+    .lead { margin: 14px 0 0; font-size: 16.5px; line-height: 1.85; color: #697586; text-wrap: pretty; }
+
+    /* メタ情報 */
+    .meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 22px; padding-top: 20px;
+            border-top: 1px solid #eef0f3; font-size: 13px; color: #94a3b8; }
+    .meta span { display: inline-flex; align-items: center; gap: 6px; }
+
+    /* 目次 */
+    .toc { margin: 34px 0 0; background: #f8fafc; border: 1px solid #eef0f3; border-radius: 14px; padding: 20px 24px; }
+    .toc-label { font-size: 11.5px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+                 color: #94a3b8; margin-bottom: 15px; }
+    .toc ol { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .toc li { display: flex; align-items: baseline; gap: 12px; }
+    .toc-num { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 600;
+               color: var(--accent); min-width: 18px; }
+    .toc a { color: #475569; text-decoration: none; font-size: 15px; font-weight: 500;
+             border-bottom: 1px solid transparent; }
+    .toc a:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, #fff); }
+
+    /* セクション */
+    .section { margin-top: 46px; scroll-margin-top: 24px; }
+    .section-head { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+    .section-icon { flex: none; width: 34px; height: 34px; border-radius: 9px; display: inline-flex;
+                    align-items: center; justify-content: center; color: var(--accent);
+                    background: color-mix(in srgb, var(--accent) 11%, #fff); }
+    .h2 { font-size: 21px; font-weight: 700; color: #0f172a; letter-spacing: -.005em; }
+
+    /* TL;DR の囲み */
+    .callout { background: color-mix(in srgb, var(--accent) 6%, #fff);
+               border: 1px solid color-mix(in srgb, var(--accent) 17%, #fff);
+               border-radius: 14px; padding: 24px 26px; }
+
+    /* 箇条書き（菱形マーカー） */
+    .list { list-style: none; }
+    .list li { position: relative; padding-left: 22px; margin-bottom: 11px; font-size: 15.5px;
+               line-height: 1.9; color: #41505f; }
+    .list li:last-child { margin-bottom: 0; }
+    .list li::before { content: ''; position: absolute; left: 3px; top: 13px; width: 6px; height: 6px;
+                       border-radius: 1.5px; background: var(--accent); transform: rotate(45deg); }
+    .list strong { color: #0f172a; font-weight: 700; }
+
+    /* コードブロック（GitHub Dark 風） */
+    .code { margin-top: 18px; }
+    .code-badge { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px; border-radius: 7px;
+                  font-size: 12px; font-weight: 600; margin-bottom: 9px; }
+    .code-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .badge-ng { color: #b42318; background: #fef3f2; border: 1px solid #fecdca; }
+    .badge-ng .dot { background: #f04438; }
+    .badge-ok { color: #067647; background: #ecfdf3; border: 1px solid #d1fadf; }
+    .badge-ok .dot { background: #12b76a; }
+    .code-frame { border: 1px solid #21262d; border-radius: 12px; overflow: hidden; background: #0d1117; }
+    .code-bar { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px;
+                background: #161b22; border-bottom: 1px solid #21262d; }
+    .code-name { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8b949e; }
+    .copy-btn { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #8b949e;
+                background: transparent; border: 1px solid #30363d; border-radius: 6px; padding: 4px 11px; cursor: pointer; }
+    .copy-btn:hover { color: #c9d1d9; border-color: #484f58; }
+    .code-frame pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: 'JetBrains Mono', monospace;
+                      font-size: 13px; line-height: 1.75; }
+    .code-frame code { background: none; padding: 0; border-radius: 0; color: #c9d1d9; font-size: 13px; }
+    /* トークン色 */
+    .k  { color: #ff7b72; } /* keyword */
+    .fn { color: #d2a8ff; } /* function */
+    .ty { color: #ffa657; } /* type */
+    .num{ color: #79c0ff; } /* number */
+    .str{ color: #7ee787; } /* string / jsx */
+    .cm { color: #8b949e; font-style: italic; } /* comment */
+
+    @media (max-width: 640px) { .card { padding: 36px 22px 40px; } .title { font-size: 26px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <article class="card">
+
+      <header>
+        <div class="tags">
+          <span class="tag"><span class="hash">#</span><tag1></span>
+          <span class="tag"><span class="hash">#</span><tag2></span>
+          <span class="tag"><span class="hash">#</span><tag3></span>
+        </div>
+
+        <h1 class="title"><タイトル></h1>
+        <p class="lead"><一行で要旨。必要なら <code>useEffect</code> のように inline code を使う。></p>
+
+        <!-- メタ情報（不要なら削除可） -->
+        <div class="meta">
+          <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>読了 約<n>分</span>
+          <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>更新 <YYYY-MM-DD></span>
+          <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.8 13 21.4a2 2 0 0 1-2.8 0l-7.6-7.6a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.4a2 2 0 0 1 1.4.6l7.6 7.6a2 2 0 0 1 0 2.8Z"/><path d="M7.5 7.5h.01"/></svg><環境: ライブラリ x.y など></span>
+        </div>
+      </header>
+
+      <!-- 目次（不要なら削除可） -->
+      <nav class="toc">
+        <div class="toc-label">Contents</div>
+        <ol>
+          <li><span class="toc-num">01</span><a href="#tldr">TL;DR — 結論</a></li>
+          <li><span class="toc-num">02</span><a href="#problem">遭遇した問題</a></li>
+          <li><span class="toc-num">03</span><a href="#cause">原因</a></li>
+          <li><span class="toc-num">04</span><a href="#solution">解決</a></li>
+          <li><span class="toc-num">05</span><a href="#refs">まとめ・参考</a></li>
+        </ol>
+      </nav>
+
+      <!-- TL;DR -->
+      <section id="tldr" class="section">
+        <div class="callout">
+          <div class="section-head">
+            <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
+            <h2 class="h2">TL;DR</h2>
+          </div>
+          <ul class="list">
+            <li><strong><結論を一言。></strong><補足。></li>
+            <li><結論2。></li>
+            <li><結論3。></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 遭遇した問題（設計知見系なら「このドキュメントの射程」等に置き換え可） -->
+      <section id="problem" class="section">
+        <div class="section-head">
+          <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg></span>
+          <h2 class="h2">遭遇した問題</h2>
+        </div>
+        <ul class="list">
+          <li><何が起きたか。></li>
+          <li><再現条件。></li>
+          <li>環境: <バージョン等>。</li>
+        </ul>
+      </section>
+
+      <!-- 原因 -->
+      <section id="cause" class="section">
+        <div class="section-head">
+          <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <h2 class="h2">原因</h2>
+        </div>
+        <ul class="list">
+          <li><なぜそうなるか。></li>
+        </ul>
+      </section>
+
+      <!-- 解決 -->
+      <section id="solution" class="section">
+        <div class="section-head">
+          <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <h2 class="h2">解決</h2>
+        </div>
+        <ul class="list">
+          <li><どう直したか / どう設計したか。></li>
+        </ul>
+
+        <!-- NG 例（任意。コピーボタンは vanilla JS で動作） -->
+        <div class="code" data-code>
+          <div class="code-badge badge-ng"><span class="dot"></span>NG</div>
+          <div class="code-frame">
+            <div class="code-bar">
+              <span class="code-name"><file.ts></span>
+              <button class="copy-btn" onclick="copyCode(event)">コピー</button>
+            </div>
+<pre><code><span class="cm">// 動かない / 良くない例</span>
+<span class="k">const</span> x = <span class="num">0</span>;</code></pre>
+          </div>
+        </div>
+
+        <!-- 推奨例 -->
+        <div class="code" data-code>
+          <div class="code-badge badge-ok"><span class="dot"></span>推奨</div>
+          <div class="code-frame">
+            <div class="code-bar">
+              <span class="code-name"><file.ts></span>
+              <button class="copy-btn" onclick="copyCode(event)">コピー</button>
+            </div>
+<pre><code><span class="cm">// 動く / 良い例。最小再現に絞る</span>
+<span class="k">const</span> x = <span class="num">1</span>;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- まとめ・参考 -->
+      <section id="refs" class="section">
+        <div class="section-head">
+          <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+          <h2 class="h2">まとめ・参考</h2>
+        </div>
+        <ul class="list">
+          <li><一行まとめ。></li>
+          <li><参考リンク。></li>
+        </ul>
+      </section>
+
+    </article>
+  </div>
+
+  <!-- コピーボタン（依存なし） -->
+  <script>
+    function copyCode(e) {
+      const btn = e.currentTarget;
+      const code = btn.closest('[data-code]').querySelector('code');
+      if (!code) return;
+      try { navigator.clipboard.writeText(code.innerText); } catch (_) {}
+      const orig = btn.textContent;
+      btn.textContent = 'コピーしました';
+      btn.style.color = '#7ee787';
+      btn.style.borderColor = '#2ea043';
+      clearTimeout(btn._t);
+      btn._t = setTimeout(() => { btn.textContent = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 1600);
+    }
+  </script>
+</body>
+</html>
