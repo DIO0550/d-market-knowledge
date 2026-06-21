@@ -3,7 +3,7 @@
   dev-knowledge ナレッジ記事テンプレート（HTML 版・オプション）
 
   - 基本は Markdown（article-format.md）。ユーザーが「HTML で」と明示したときだけ使う。
-  - 構成は md 版と同一: タグ → タイトル → TL;DR → 遭遇した問題 → 原因 → 解決 → まとめ・参考。
+  - 構成は md 版と同一: タグ → タイトル → TL;DR → 遭遇した問題 → 原因 → 解決 → まとめ → 参考。
   - 中身のルールも md 版と同じ（1記事1トピック / tags 必須 / 日本語 / 最小コード）。
   - <…> の箇所を差し替えて使う。
   - アクセント色は :root の --accent を変える。プリセット: #2563eb（青）/ #0d9488（teal）/ #d97757（橙）/ #7c3aed（紫）
@@ -143,7 +143,8 @@
           <li><span class="toc-num">02</span><a href="#problem">遭遇した問題</a></li>
           <li><span class="toc-num">03</span><a href="#cause">原因</a></li>
           <li><span class="toc-num">04</span><a href="#solution">解決</a></li>
-          <li><span class="toc-num">05</span><a href="#refs">まとめ・参考</a></li>
+          <li><span class="toc-num">05</span><a href="#summary">まとめ</a></li>
+          <li><span class="toc-num">06</span><a href="#refs">参考</a></li>
         </ol>
       </nav>
 
@@ -223,15 +224,25 @@
         </div>
       </section>
 
-      <!-- まとめ・参考 -->
+      <!-- まとめ -->
+      <section id="summary" class="section">
+        <div class="section-head">
+          <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          <h2 class="h2">まとめ</h2>
+        </div>
+        <ul class="list">
+          <li><一行まとめ。要点を短く。></li>
+        </ul>
+      </section>
+
+      <!-- 参考 -->
       <section id="refs" class="section">
         <div class="section-head">
           <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
-          <h2 class="h2">まとめ・参考</h2>
+          <h2 class="h2">参考</h2>
         </div>
         <ul class="list">
-          <li><一行まとめ。></li>
-          <li><参考リンク。></li>
+          <li><参考リンク・出典。></li>
         </ul>
       </section>
 
