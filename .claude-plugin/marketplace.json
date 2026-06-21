@@ -9,8 +9,8 @@
   },
   "plugins": [
     {
-      "name": "market-knowledge",
-      "source": "./plugins/market-knowledge",
+      "name": "knowledge-vault",
+      "source": "./plugins/knowledge-vault",
       "version": "1.0.0",
       "description": "d-market関連の知識・ナレッジをまとめるプラグイン。"
     }
