@@ -9,6 +9,12 @@ description: "gh コマンドで technical_memo リポジトリ（dio0550/techni
 
 起票した issue は、technical_memo 側で Issue から起動されたときに `html-educational-material` スキルと二段階 subagent フロー（reader → writer）で HTML 教材化される。**このスキルは「起票する」役、HTML 生成は technical_memo 側が担う。**
 
+## 起動のしかた（基本はユーザー起動）
+
+- このスキルは **ユーザーが「issue にして」「教材ネタを起票して」などと明示的に依頼したとき**に起動する。Claude の判断で勝手に issue を量産しない。
+- 起票する内容（タイトル・本文・ラベル）は、迷ったらユーザーに確認してから `gh` を実行する。特に進め方ラベルの選択（`knowledge:direct` / `knowledge:pr`）は最終的にユーザーの判断に従う。
+- 会話セッションを振り返って候補を洗い出し**複数まとめて**起票したいときは、選別フローを持つ `knowledge-harvest` 系の進め方（対象も起票対象もユーザーに選ばせる）に倣う。
+
 ---
 
 ## 進め方ラベル（2種類・必須）
