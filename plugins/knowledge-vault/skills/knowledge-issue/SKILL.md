@@ -1,5 +1,6 @@
 ---
 name: knowledge-issue
+disable-model-invocation: true
 description: "gh コマンドで dev-knowledge リポジトリ（dio0550/dev-knowledge）に GitHub Issue を作成するスキル。登録するナレッジには「どうリポジトリに反映するか」を表す2種類のラベルを必ず1つ付ける: knowledge:pr（ブランチで調査しPRでナレッジmdを作る）/ knowledge:direct（mainで作業しmd化して直接push）。使い方は(A) knowledge-article で作った記事を登録、(B) 開発中の疑問・設計メモを起票、の2通り。「issueに作って」「issue化」「ghでissue立てて」「これissueにしといて」「あとで調べたい」「設計の疑問をissueに」「register knowledge issue」などのキーワードでトリガー。"
 ---
 

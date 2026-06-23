@@ -1,5 +1,6 @@
 ---
 name: doc-issue
+disable-model-invocation: true
 description: "gh コマンドで technical_memo リポジトリ（dio0550/technical_memo）に「HTML 教材を作る」ための GitHub Issue を作成するスキル。technical_memo は技術概念を図解・フロー図・比較表で解説する HTML 教材＋理解度クイズを貯めるリポジトリ。Issue には「どう反映するか」を表す2種類のラベルを必ず1つ付ける: knowledge:pr（ブランチで調査しPRで HTML 教材を作る）/ knowledge:direct（mainで作業してHTML化し直接push）。使い方は(A) 教材化したいトピックを依頼として起票、(B) あとで教材化したい疑問・素材メモを起票、の2通り。「教材issueにして」「technical_memoにissue立てて」「このトピックHTML化のissueにして」「あとで教材にしたい」「解説資料のネタをissueに」「register doc issue」などのキーワードでトリガー。dev-knowledge 向けに起票したいときは knowledge-issue を使う。"
 ---
 
