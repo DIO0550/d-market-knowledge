@@ -1,5 +1,6 @@
 ---
 name: knowledge-harvest
+disable-model-invocation: true
 description: "会話セッション（現在の会話、または今までの会話ログ）を振り返って、ナレッジ化できそうな知見・遭遇した問題と解決・設計判断・再利用できる手順を洗い出し、dev-knowledge（dio0550/dev-knowledge）の GitHub Issue として起票するスキル。対象の会話をユーザーに選ばせ→サブエージェントで候補を情報収集→ユーザーが起票対象を選別→進め方ラベル（knowledge:pr / knowledge:direct）付きで起票、までを担う。「この会話からナレッジ集めて」「今のセッションでissueにできそうなもの」「会話からナレッジissue化」「知見を棚卸ししてissueに」「ナレッジ候補を洗い出して」「harvest knowledge from conversation」などのキーワードでトリガー。1記事1トピックの粒度で複数候補をまとめて起票したいときに使う。実際の1件ずつの起票メカニクスは knowledge-issue スキルに委譲する。"
 ---
 

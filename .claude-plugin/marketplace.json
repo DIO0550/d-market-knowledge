@@ -11,14 +11,14 @@
     {
       "name": "knowledge-vault",
       "source": "./plugins/knowledge-vault",
-      "version": "1.4.0",
+      "version": "1.4.2",
       "description": "d-market関連の知識・ナレッジをまとめるプラグイン。dev-knowledgeフォーマットのナレッジ記事を作成するknowledge-article、その記事をghでdev-knowledgeのGitHub Issueに登録するknowledge-issue、会話セッションからナレッジ候補を洗い出してまとめてissue化するknowledge-harvestを提供する。"
     },
     {
       "name": "doc-knowledge",
       "source": "./plugins/doc-knowledge",
-      "version": "1.0.0",
-      "description": "技術教育・解説資料用のHTML作成スキル（html-educational-material）を提供するプラグイン。暗号技術・アルゴリズム・システム設計などの技術概念を、図解・フロー図・比較表で視覚的に説明する学術ノート風ライトテーマのHTMLを作成し、理解度確認用のクイズHTMLも生成できる。"
+      "version": "1.1.0",
+      "description": "技術教育・解説資料用のHTML作成スキルを提供するプラグイン。html-educational-material で技術概念を図解・フロー図・比較表で視覚的に説明する学術ノート風ライトテーマのHTMLと理解度クイズHTMLを作成し、doc-issue で「HTML教材化したいトピック」を technical_memo（dio0550/technical_memo）の GitHub Issue に起票できる。"
     }
   ]
 }
