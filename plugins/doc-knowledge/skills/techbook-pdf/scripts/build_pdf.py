@@ -18,29 +18,154 @@ techbook-pdf : 本文HTML断片 → 参考書スタイルのPDF
 
 import argparse
 import html
+import importlib
+import os
 import re
 import subprocess
 import sys
+import textwrap
 from pathlib import Path
 
 # ---------------------------------------------------------------- 依存の確保
+#
+# 依存を黙って pip install しない。サプライチェーン対策として:
+#   1. requirements.lock.txt でバージョンと sha256 を固定する（後から出た
+#      改竄リリースを自動で拾わない。検証は pip の --require-hashes が行う）
+#   2. 導入は --install-deps を明示したときだけ行う（import の副作用にしない）
+#   3. 入れる先はこのスキル専用の .venv に限る（システムの Python を汚さない）
+#   4. wheel のみ許可し、索引は pypi.org に固定する（sdist のビルド時コード実行と、
+#      環境変数や pip.conf による索引すり替えを封じる）
+# 既に依存が入っている環境では、この節は何もせず素通りする。
 
-def ensure(mod: str, pkg: str | None = None):
-    """未インストールなら pip install してから import する。"""
-    try:
-        return __import__(mod)
-    except ImportError:
-        subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-q",
-             "--break-system-packages", pkg or mod],
-            check=True,
-        )
-        return __import__(mod)
+SKILL_DIR = Path(__file__).resolve().parent
+LOCK = SKILL_DIR / "requirements.lock.txt"
+VENV = SKILL_DIR / ".venv"
+
+# import 名 → パッケージ名
+REQUIRED = {"bs4": "beautifulsoup4", "weasyprint": "weasyprint", "pygments": "pygments"}
+
+_REEXEC_GUARD = "TECHBOOK_PDF_IN_VENV"
 
 
-ensure("bs4", "beautifulsoup4")
-ensure("weasyprint")
-ensure("pygments")
+def _missing() -> list[str]:
+    """未導入のパッケージ名を返す。"""
+    importlib.invalidate_caches()
+    out = []
+    for mod, pkg in REQUIRED.items():
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            out.append(pkg)
+    return out
+
+
+def _venv_python() -> Path | None:
+    exe = VENV / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    return exe if exe.exists() else None
+
+
+def _install_deps() -> None:
+    """ロックから .venv に導入する。ハッシュが合わなければ pip が失敗して止まる。"""
+    if not LOCK.exists():
+        sys.exit(f"依存ロックが見つからない: {LOCK}")
+
+    if not _venv_python():
+        print(f"隔離環境を作成: {VENV}", file=sys.stderr)
+        subprocess.run([sys.executable, "-m", "venv", str(VENV)], check=True)
+
+    py = _venv_python()
+    print("ロックから依存を導入（sha256 を検証）…", file=sys.stderr)
+    subprocess.run(
+        [str(py), "-m", "pip", "install",
+         "--isolated",              # PIP_* 環境変数と pip.conf を無視する
+         "--require-hashes",        # 全要件にハッシュ必須。1つでも欠ければ拒否
+         "--only-binary", ":all:",  # sdist を拒否＝ビルド時の任意コード実行を防ぐ
+         "--no-deps",               # ロックが依存の全体。解決で勝手に増やさない
+         "--index-url", "https://pypi.org/simple",
+         "--disable-pip-version-check",
+         "-r", str(LOCK)],
+        check=True,
+    )
+
+
+def _in_our_venv() -> bool:
+    """すでに .venv の中で動いているか。
+
+    .venv/bin/python は基底インタプリタへのシンボリックリンクなので、
+    実行ファイルのパスを resolve して比べても区別できない。sys.prefix で見る。
+    """
+    return Path(sys.prefix).resolve() == VENV.resolve()
+
+
+def _reexec_into_venv() -> None:
+    """.venv の python で自分を起動し直す。"""
+    py = _venv_python()
+    if py is None or _in_our_venv() or os.environ.get(_REEXEC_GUARD):
+        return
+    os.environ[_REEXEC_GUARD] = "1"  # exec のループ防止
+    os.execv(str(py), [str(py), str(Path(__file__).resolve()), *sys.argv[1:]])
+
+
+def _bootstrap() -> None:
+    if not _missing():
+        return
+
+    if "--install-deps" in sys.argv:
+        _install_deps()
+
+    _reexec_into_venv()  # .venv があるならそちらで動かし直す
+
+    still = _missing()
+    if not still:
+        return
+
+    sys.exit(textwrap.dedent(f"""\
+        依存パッケージが不足している: {', '.join(still)}
+
+        次のどちらかで導入する。
+
+          1) 検証済みロックから隔離環境に入れる（推奨。システムのPythonは触らない）
+               python3 {Path(__file__).name} --install-deps <他の引数…>
+
+          2) 自分で環境を用意して入れる
+               pip install -r {LOCK} \\
+                   --require-hashes --only-binary :all: --no-deps \\
+                   --index-url https://pypi.org/simple
+
+        バージョンと sha256 は requirements.lock.txt に固定してある。
+        更新は scripts/update_lock.py で行い、差分をレビューしてから取り込む。"""))
+
+
+def _warn_version_drift() -> None:
+    """ロックと違うバージョンで動いている場合に一度だけ知らせる。"""
+    from importlib.metadata import PackageNotFoundError, version
+
+    if not LOCK.exists():
+        return
+
+    pinned = {}
+    for line in LOCK.read_text().splitlines():
+        if line.startswith(("#", " ")) or "==" not in line:
+            continue
+        name, _, rest = line.partition("==")
+        pinned[name.strip().lower()] = rest.split()[0].strip()
+
+    drift = []
+    for pkg in REQUIRED.values():
+        try:
+            got = version(pkg)
+        except PackageNotFoundError:
+            continue
+        want = pinned.get(pkg.lower())
+        if want and got != want:
+            drift.append(f"{pkg} {got}（ロックは {want}）")
+    if drift:
+        print(f"警告: ロックと異なるバージョンで実行中: {', '.join(drift)}",
+              file=sys.stderr)
+
+
+_bootstrap()
+_warn_version_drift()
 
 from bs4 import BeautifulSoup  # noqa: E402
 from pygments import highlight  # noqa: E402
@@ -326,6 +451,9 @@ def main() -> int:
     ap.add_argument("--no-sidenotes", dest="sidenotes", action="store_false",
                     help="側注を使わない（左右対称の狭いマージンにする）")
     ap.add_argument("--keep-html", action="store_true")
+    ap.add_argument("--install-deps", action="store_true",
+                    help="不足依存を requirements.lock.txt から .venv に導入する"
+                         "（sha256 検証あり。システムのPythonには入れない）")
     args = ap.parse_args()
 
     src = Path(args.input)

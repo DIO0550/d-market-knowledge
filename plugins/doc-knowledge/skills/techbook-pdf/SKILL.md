@@ -39,6 +39,26 @@ python3 scripts/build_pdf.py content.html -o book.pdf \
 | `--no-cover` / `--no-toc` / `--no-index` | — | 各パートを省く |
 | `--no-sidenotes` | — | 側注を使わない。外マージンが狭い左右対称の版面になる |
 | `--keep-html` | — | 中間HTMLを残す。崩れの原因調査に使う |
+| `--install-deps` | — | 不足依存をロックから `.venv` に導入する（下記） |
+
+## 依存とその導入
+
+WeasyPrint / BeautifulSoup / Pygments に依存するが、**スクリプトは依存を勝手に入れない**。
+不足していればコマンドを示して停止するので、初回だけ次を実行する。
+
+```bash
+python3 scripts/build_pdf.py --install-deps content.html -o book.pdf --preset b5 --title "…"
+```
+
+`scripts/requirements.lock.txt` に全17パッケージのバージョンと sha256 が固定してあり、
+これを `--require-hashes` 付きで `scripts/.venv` に導入する。導入先はこの venv だけで、
+システムの Python には書き込まない。2回目以降は自動で venv 側に切り替わるので指定不要。
+
+ハッシュ不一致で失敗したら**取り込まずに止める**。配布物がすり替わった可能性がある。
+
+依存を更新するときは `python3 scripts/update_lock.py` でロックを作り直し、
+**バージョンとハッシュの差分を必ずレビューしてから**コミットする。
+`--check` を付けるとロックが最新かだけ確認できる。
 
 ## 本文HTMLの骨格
 

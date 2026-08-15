@@ -127,8 +127,15 @@ appendのあとは `assign_heading_ids()` を再実行して、新しい見出�
 
 ## ビルドが通らない
 
-- `ModuleNotFoundError` — `build_pdf.py` は不足パッケージを自動で `pip install` する。
-  ネットワークが無い環境では事前に `pip install weasyprint beautifulsoup4 pygments` を実行する。
+- `依存パッケージが不足している` — 依存は自動では入らない。`--install-deps` を付けて
+  実行すると `scripts/requirements.lock.txt`（バージョンと sha256 を固定）から
+  `scripts/.venv` に導入され、以降はそこで動く。詳細は SKILL.md「依存とその導入」。
+- `THESE PACKAGES DO NOT MATCH THE HASHES` — 取得した配布物がロックのハッシュと違う。
+  **握り潰さない。** ロックを更新した直後（`update_lock.py` の差分未コミット）でなければ、
+  配布物のすり替えか索引の汚染を疑う。ネットワークと索引設定を確認し、原因が分かるまで入れない。
+- `ネットワークが無い環境` — 事前に別環境で
+  `pip install -r scripts/requirements.lock.txt --require-hashes --only-binary :all: --no-deps`
+  を通した venv を持ち込むか、wheel を `pip download` して同じロックでオフライン導入する。
 - `OSError: cannot load library 'gobject-2.0'` — WeasyPrintのシステム依存が不足している。
   `apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b` を入れる。
 - レイアウトが想定と違う — `--keep-html` で中間HTMLを出し、ブラウザで開いて構造を確認する。
