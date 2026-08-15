@@ -1,0 +1,65 @@
+<!-- 本文HTML断片の骨格。<html>や<head>は書かない。build_pdf.py に渡す。 -->
+
+<section class="chapter">
+  <header class="ch-opener">
+    <p class="ch-num"></p>
+    <h1>章タイトル</h1>
+    <div class="goals">
+      <p class="goals-title">この章で学ぶこと</p>
+      <ul>
+        <li>到達目標1</li>
+        <li>到達目標2</li>
+      </ul>
+    </div>
+  </header>
+
+  <h2>節タイトル</h2>
+
+  <p>本文。<span class="idx" data-term="用語" data-yomi="ようご">用語</span>はこのように索引語としてマークする<span class="snref">※1</span>。</p>
+
+  <aside class="sidenote">
+    <span class="sn-label">※1</span>
+    側注は参照した段落の直後に置く。
+  </aside>
+
+  <div class="callout point">
+    <p class="co-title"></p>
+    <p>読者に持ち帰ってほしい要点を1〜3文で。</p>
+  </div>
+
+  <h3>項タイトル</h3>
+
+  <figure class="code">
+    <figcaption>ファイル名や説明<span class="lang">python</span></figcaption>
+    <pre><code class="language-python">def main() -> None:
+    print("hello")</code></pre>
+  </figure>
+
+  <div class="example">
+    <p class="ex-title">例題タイトル</p>
+    <div class="ex-body"><p>問題文。</p></div>
+    <div class="ex-answer"><p>解答と解説。</p></div>
+  </div>
+
+  <div class="summary">
+    <p class="sum-title">この章のまとめ</p>
+    <ul>
+      <li>要点1</li>
+    </ul>
+  </div>
+
+  <section class="exercises">
+    <h2>演習問題</h2>
+    <ol>
+      <li>設問1</li>
+    </ol>
+  </section>
+</section>
+
+<section class="answers">
+  <h1>演習問題の解答</h1>
+  <div class="ans-item">
+    <p class="ans-head">第1章　問1</p>
+    <p>解答。</p>
+  </div>
+</section>
