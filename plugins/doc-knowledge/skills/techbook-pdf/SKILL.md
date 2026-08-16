@@ -60,6 +60,27 @@ python3 scripts/build_pdf.py --install-deps content.html -o book.pdf --preset b5
 **バージョンとハッシュの差分を必ずレビューしてから**コミットする。
 `--check` を付けるとロックが最新かだけ確認できる。
 
+### ロックの選定方針
+
+`update_lock.py` は**最新版を選ばない**。公開から14日を過ぎた版のうち最も新しいものを採る
+（`--min-age` で変更可）。リリースが乗っ取られた場合、発覚するのは公開から数日後になるため、
+最新版を追うとその窓に自分から入ることになる。
+
+更新時は次も確認する。ロック済みバージョンの安全性は、ハッシュ固定では保証されない。
+
+```bash
+# マルウェア判定（Aikido Intel。pip も対象）
+npm install -g @aikidosec/safe-chain && safe-chain setup-ci
+pip install -r scripts/requirements.lock.txt --require-hashes --only-binary :all: --no-deps
+
+# 既知の脆弱性・悪性パッケージ報告（OSV は MAL- として悪性パッケージも収録している）
+curl -s -X POST https://api.osv.dev/v1/querybatch -d '{"queries":[…]}'
+```
+
+長期間更新の無かったパッケージが突然リリースされていたら、取り込む前に理由を確認する。
+メンテナのアカウント乗っ取りでよく見られる兆候で、実際に本スキルでも `webencodings` が
+9年ぶりに同日2連続リリースされていたため 0.5.1 に留めている。
+
 ## 本文HTMLの骨格
 
 ```html
