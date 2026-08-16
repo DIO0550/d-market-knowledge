@@ -77,9 +77,24 @@ pip install -r scripts/requirements.lock.txt --require-hashes --only-binary :all
 curl -s -X POST https://api.osv.dev/v1/querybatch -d '{"queries":[…]}'
 ```
 
-長期間更新の無かったパッケージが突然リリースされていたら、取り込む前に理由を確認する。
-メンテナのアカウント乗っ取りでよく見られる兆候で、実際に本スキルでも `webencodings` が
-9年ぶりに同日2連続リリースされていたため 0.5.1 に留めている。
+長く更新の無かったパッケージが突然リリースされていたら、取り込む前に**配布物と
+公開ソースを突き合わせる**。乗っ取りならタグに無いコードが配布物に入る。
+
+```bash
+pip download --no-deps --no-binary :all: <pkg>==<ver> -d /tmp/x   # 実行はしない
+git clone <repo> && git checkout v<ver>
+diff -r <repo>/<pkg> /tmp/x/<pkg>-<ver>/<pkg>
+```
+
+**`webencodings` 0.6.x はこの手順で確認済み（乗っ取りではない）。** 2017年の 0.5.1 以降
+休眠していたが、2026-08-15 に 0.6.0 と 0.6.1 が同日公開された。調べた結果、
+WeasyPrint 一式を維持する CourtBouillon への移管で、配布物は `CourtBouillon/webencodings`
+のタグ `v0.6.1` と完全一致した（同日2連続なのは 0.6.0 のPyPIリンクが旧所在のままだったため）。
+旧所在 `gsnedders/python-webencodings` は2017年で止まっているので、そちらを見ると
+「GitHubが更新されていない」ように見える。現所在は `CourtBouillon/webencodings`。
+
+なお現在 0.5.1 に留めているのは上記14日ルールの結果であって、0.6.1 を危険と判断した
+からではない。次回ロック更新時には期間を満たして自然に上がる。
 
 ## 本文HTMLの骨格
 
