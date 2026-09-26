@@ -355,6 +355,168 @@
     color:var(--ink-muted);
   }
 
+  /* ===== Unanswered navigation ===== */
+  /* [インタラクション #7] 未回答の問題へジャンプ */
+  .unanswered-btn{
+    position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%);
+    display:inline-flex;align-items:center;gap:.45rem;
+    padding:.55rem 1.1rem;
+    background:var(--bg-surface);color:var(--accent-ink);
+    border:1.5px solid var(--accent);border-radius:999px;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    font-size:.82rem;font-weight:600;
+    cursor:pointer;z-index:100;
+    box-shadow:0 4px 14px rgba(44,90,160,.18);
+    transition:background-color .2s ease, color .2s ease;
+  }
+  .unanswered-btn[hidden]{display:none}
+  .unanswered-btn:hover{background:var(--accent);color:#fff}
+  .unanswered-btn .ua-count{font-family:"JetBrains Mono",monospace;font-weight:700}
+  .question-card:focus{outline:none}
+  .question-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .question-card.jump-highlight{animation:jump-pulse 1.2s ease-out}
+  @keyframes jump-pulse{
+    0%{box-shadow:0 0 0 0 rgba(44,90,160,.45)}
+    100%{box-shadow:0 0 0 14px rgba(44,90,160,0)}
+  }
+
+  /* ===== Question navigator（左サイドバー） ===== */
+  /* [インタラクション #8] 問題一覧。解説HTMLの目次と同じ開閉の仕組みで、初期状態は閉じている */
+  .qnav{
+    position:fixed;top:0;left:0;bottom:0;width:260px;z-index:50;
+    background:var(--bg-surface);
+    border-right:1px solid var(--rule);
+    box-shadow:2px 0 24px rgba(44,90,160,.05);
+    display:flex;flex-direction:column;
+    font-family:"Inter","Noto Sans JP",sans-serif;
+    transition:transform .28s ease;
+  }
+  .qnav.collapsed{transform:translateX(-100%)}
+  .qnav-head{padding:1.15rem 1.25rem 1rem;border-bottom:1px solid var(--rule)}
+  .qnav-title{
+    display:flex;align-items:center;gap:.6rem;
+    font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;
+  }
+  .qnav-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .qnav-progress{
+    margin-top:.8rem;display:flex;justify-content:space-between;align-items:baseline;
+    font-size:.78rem;color:var(--ink-secondary);
+  }
+  .qnav-progress b{font-family:"JetBrains Mono",monospace;color:var(--accent);font-size:.9rem}
+  .qnav-bar{height:4px;margin-top:.4rem;background:var(--bg-subtle);border-radius:2px;overflow:hidden}
+  .qnav-bar-fill{height:100%;width:0;background:var(--accent);transition:width .3s ease}
+  .qnav-filter{
+    display:flex;margin-top:.85rem;
+    border:1px solid var(--rule);border-radius:3px;overflow:hidden;
+  }
+  .qnav-filter button{
+    flex:1;padding:.38rem .5rem;border:none;cursor:pointer;
+    background:var(--bg-surface);color:var(--ink-secondary);
+    font-family:inherit;font-size:.75rem;
+    transition:background-color .15s ease, color .15s ease;
+  }
+  .qnav-filter button + button{border-left:1px solid var(--rule)}
+  .qnav-filter button:hover:not(.is-active){background:var(--accent-soft)}
+  .qnav-filter button.is-active{background:var(--accent);color:#fff;font-weight:600}
+  .qnav nav{padding:.7rem .6rem;flex:1;overflow-y:auto}
+  .qnav-list{list-style:none}
+  .qnav-item button{
+    position:relative;display:flex;align-items:flex-start;gap:.7rem;
+    width:100%;padding:.55rem .7rem;
+    border:none;border-radius:4px;background:transparent;cursor:pointer;
+    text-align:left;font-family:inherit;color:var(--ink-secondary);
+    transition:background-color .2s ease;
+  }
+  .qnav-item button:hover{background:var(--accent-soft)}
+  .qnav-item.is-current button{background:var(--accent-soft)}
+  .qnav-item.is-current button::before{
+    content:"";position:absolute;left:0;top:20%;height:60%;width:3px;
+    background:var(--accent);border-radius:2px;
+  }
+  .qn-num{
+    flex-shrink:0;min-width:40px;height:24px;margin-top:.1rem;
+    display:inline-flex;align-items:center;justify-content:center;gap:.2rem;
+    border-radius:2px;
+    font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:700;
+  }
+  .qnav-item[data-state="un"] .qn-num{background:var(--bg-surface);border:1.5px solid var(--accent);color:var(--accent-ink)}
+  .qnav-item[data-state="ok"] .qn-num{background:var(--ok-soft);border:1px solid var(--ok);color:var(--ok)}
+  .qnav-item[data-state="ng"] .qn-num{background:var(--danger-soft);border:1px solid var(--danger);color:var(--danger)}
+  .qnav-item[data-state="ok"] .qn-num::after{content:"✓"}
+  .qnav-item[data-state="ng"] .qn-num::after{content:"✗"}
+  .qn-body{display:flex;flex-direction:column;min-width:0}
+  .qn-type{
+    font-family:"JetBrains Mono",monospace;font-size:.6rem;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);
+  }
+  .qn-text{
+    font-size:.8rem;line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .qnav-item[data-state="un"] .qn-text{color:var(--ink-primary);font-weight:500}
+  .qnav-item[data-state="ok"] .qn-text,
+  .qnav-item[data-state="ng"] .qn-text{color:var(--ink-muted)}
+  .qnav-empty{
+    display:none;padding:1.5rem .75rem;text-align:center;
+    font-size:.82rem;color:var(--ok);
+  }
+  .qnav-empty.show{display:block}
+  .qnav-foot{
+    display:flex;gap:.9rem;padding:.8rem 1.25rem;
+    border-top:1px solid var(--rule);
+    font-size:.7rem;color:var(--ink-muted);
+  }
+  .qnav-foot i{
+    display:inline-block;width:10px;height:10px;border-radius:2px;
+    margin-right:.3rem;vertical-align:-1px;
+  }
+  .qnav-foot .un{border:1.5px solid var(--accent)}
+  .qnav-foot .ok{background:var(--ok-soft);border:1px solid var(--ok)}
+  .qnav-foot .ng{background:var(--danger-soft);border:1px solid var(--danger)}
+
+  .qnav-toggle{
+    position:fixed;top:1rem;left:1rem;z-index:60;
+    width:40px;height:40px;border-radius:6px;
+    background:var(--bg-surface);border:1px solid var(--rule);
+    color:var(--accent);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 10px rgba(44,90,160,.08);
+    transition:all .25s ease;
+  }
+  .qnav-toggle:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .qnav-toggle svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .qnav-toggle.is-open{left:calc(260px - 20px);background:var(--accent);color:#fff;border-color:var(--accent)}
+  .qnav-toggle.is-open:hover{background:var(--accent-ink)}
+  .qnav-badge{
+    position:absolute;top:-7px;right:-7px;
+    min-width:20px;height:20px;padding:0 5px;border-radius:999px;
+    background:var(--accent);color:#fff;border:2px solid var(--bg-page);
+    font-family:"JetBrains Mono",monospace;font-size:.66rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .qnav-badge:empty{display:none}
+  .qnav-toggle.is-open .qnav-badge{display:none}
+  .qnav-backdrop{
+    position:fixed;inset:0;z-index:45;
+    background:rgba(26,35,50,.35);
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+  }
+  .qnav-backdrop.is-visible{opacity:1;pointer-events:auto}
+  @media(min-width:1100px){
+    body{transition:padding-left .28s ease}
+    body.qnav-open{padding-left:260px}
+    body.qnav-open .unanswered-btn{left:calc(50% + 130px)}
+  }
+  /* 開閉ボタン（左上固定）とヘッダーが重ならないよう、狭い画面では上の余白を広げる */
+  @media(max-width:860px){body .container{padding-top:4.5rem}}
+  /* 狭い画面でサイドバーを開いている間は、下部の未回答ボタンを隠す（一覧と重なるため） */
+  @media(max-width:1099px){body.qnav-open .unanswered-btn{display:none}}
+  @media(max-width:640px){
+    .qnav{width:240px}
+    .qnav-toggle.is-open{left:calc(240px - 20px)}
+  }
+
   /* ===== Result ===== */
   .result-section{
     display:none;margin-top:2rem;
@@ -472,6 +634,34 @@
 
 <div class="progress" id="progress"></div>
 
+<button class="qnav-toggle" id="qnav-toggle" aria-label="問題一覧を開閉" aria-expanded="false" aria-controls="qnav">
+  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  <span class="qnav-badge" id="qnav-badge" aria-hidden="true"></span>
+</button>
+
+<div class="qnav-backdrop" id="qnav-backdrop" aria-hidden="true"></div>
+
+<aside class="qnav collapsed" id="qnav" aria-label="問題一覧">
+  <div class="qnav-head">
+    <div class="qnav-title"><span class="qnav-dot"></span>Questions</div>
+    <div class="qnav-progress"><span>回答済み</span><span><b id="qnav-answered">0</b> / <span id="qnav-total">0</span></span></div>
+    <div class="qnav-bar"><div class="qnav-bar-fill" id="qnav-bar-fill"></div></div>
+    <div class="qnav-filter" role="group" aria-label="表示する問題">
+      <button class="is-active" data-filter="all" aria-pressed="true">すべて</button>
+      <button data-filter="unanswered" aria-pressed="false">未回答のみ</button>
+    </div>
+  </div>
+  <nav>
+    <ol class="qnav-list" id="qnav-list"></ol>
+    <p class="qnav-empty" id="qnav-empty">✓ すべて回答済み</p>
+  </nav>
+  <div class="qnav-foot">
+    <span><i class="un"></i>未回答</span>
+    <span><i class="ok"></i>正解</span>
+    <span><i class="ng"></i>不正解</span>
+  </div>
+</aside>
+
 <div class="container">
 
   <header>
@@ -510,6 +700,10 @@
     </div>
   </div>
 </div>
+
+<button class="unanswered-btn" id="unanswered-btn" onclick="jumpToNextUnanswered()" hidden>
+  未回答 <span class="ua-count" id="unanswered-count">0</span> 問 <span aria-hidden="true">↓</span>
+</button>
 
 <button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()" aria-label="最上部へ">↑</button>
 
@@ -567,6 +761,7 @@ const quizData = [
 const answers = new Array(quizData.length).fill(null);
 const sortOrders = quizData.map(q => q.type==='sort' ? shuffled(q.items.length) : null);
 let answeredCount = 0;
+let lastJumped = null; // 未回答ジャンプで最後に移動した問題の index
 
 function shuffled(n){
   const arr=[...Array(n).keys()];
@@ -587,6 +782,7 @@ function countByType(){
 function initQuiz(){
   answers.fill(null);
   answeredCount=0;
+  lastJumped=null;
   quizData.forEach((q,i)=>{ if(q.type==='sort') sortOrders[i]=shuffled(q.items.length); });
 
   document.getElementById('total-count').textContent=quizData.length;
@@ -606,7 +802,9 @@ function initQuiz(){
   document.getElementById('result-section').classList.remove('show');
   document.getElementById('submit-section').style.display='block';
   renderAll();
+  renderQnav();
   updateAnsweredCount();
+  checkAllAnswered();
 }
 
 function renderAll(){
@@ -615,7 +813,7 @@ function renderAll(){
   quizData.forEach((q,idx)=>{
     const typeLabel = q.type==='yesno'?'YES/NO' : q.type==='sort'?'SORT':'MULTIPLE CHOICE';
     html += `
-      <div class="question-card" id="question-${idx}">
+      <div class="question-card" id="question-${idx}" tabindex="-1">
         <div class="question-header">
           <div class="question-number">Q${String(idx+1).padStart(2,'0')}</div>
           <span class="question-type">${typeLabel}</span>
@@ -839,6 +1037,47 @@ function checkAllAnswered(){
     btn.disabled=true;
     hint.textContent=`残り ${quizData.length-answeredCount} 問`;
   }
+  updateUnansweredNav();
+}
+
+/* [インタラクション #7] 未回答の問題へジャンプ */
+function unansweredIndexes(){
+  return answers.flatMap((a,i)=> a===null ? [i] : []);
+}
+
+function updateUnansweredNav(){
+  const rest=unansweredIndexes();
+  document.getElementById('unanswered-count').textContent=rest.length;
+  const btn=document.getElementById('unanswered-btn');
+  btn.hidden = rest.length===0;
+  btn.setAttribute('aria-label',`次の未回答の問題へ移動（残り ${rest.length} 問）`);
+  updateQnav();
+}
+
+// 読んでいる問題より後ろの未回答へ。無ければ先頭の未回答へ戻る。
+// ページ末尾の問題はそれ以上スクロールできず画面上端に来ないので、直前に飛んだ問題が画面内にあればそこを読んでいる位置とみなす
+function jumpToNextUnanswered(){
+  const rest=unansweredIndexes();
+  if(rest.length===0) return;
+  const rects=quizData.map((_,i)=>document.getElementById(`question-${i}`).getBoundingClientRect());
+  let current=-1;
+  rects.forEach((r,i)=>{ if(r.top<=80) current=i; });
+  if(lastJumped!==null && rects[lastJumped].bottom>0 && rects[lastJumped].top<window.innerHeight){
+    current=Math.max(current,lastJumped);
+  }
+  jumpToQuestion(rest.find(i=>i>current) ?? rest[0]);
+}
+
+function jumpToQuestion(idx){
+  lastJumped=idx;
+  const card=document.getElementById(`question-${idx}`);
+  const y=card.getBoundingClientRect().top+window.scrollY-24;
+  window.scrollTo({top:y,behavior:'smooth'});
+  card.focus({preventScroll:true});
+  card.classList.remove('jump-highlight');
+  void card.offsetWidth; // 同じカードへ続けて飛んだときもアニメを再生し直す
+  card.classList.add('jump-highlight');
+  card.addEventListener('animationend',()=>card.classList.remove('jump-highlight'),{once:true});
 }
 
 function isCorrect(i){
@@ -921,6 +1160,87 @@ window.addEventListener('scroll',()=>{
   const scrolled=h.scrollTop/(h.scrollHeight-h.clientHeight);
   document.getElementById('progress').style.width=(scrolled*100)+'%';
 },{passive:true});
+
+/* ===== 問題一覧サイドバー ===== */
+const qnav=document.getElementById('qnav');
+const qnavToggle=document.getElementById('qnav-toggle');
+const qnavBackdrop=document.getElementById('qnav-backdrop');
+const isNarrow=()=>window.matchMedia('(max-width:1099px)').matches;
+let qnavFilter='all';
+let cardObserver=null;
+
+function setQnavOpen(open){
+  qnav.classList.toggle('collapsed',!open);
+  document.body.classList.toggle('qnav-open',open);
+  qnavToggle.classList.toggle('is-open',open);
+  qnavToggle.setAttribute('aria-expanded',String(open));
+  qnavBackdrop.classList.toggle('is-visible',open && isNarrow());
+}
+
+function renderQnav(){
+  const typeLabel={multiple:'4択', yesno:'YES/NO', sort:'並べ替え'};
+  const list=document.getElementById('qnav-list');
+  list.innerHTML='';
+  quizData.forEach((q,i)=>{
+    const li=document.createElement('li');
+    li.className='qnav-item';
+    li.id=`qnav-item-${i}`;
+    const tmp=document.createElement('div');
+    tmp.innerHTML=q.question; // 問題文の HTML からテキストだけ取り出す
+    li.innerHTML=`<button type="button">
+      <span class="qn-num">Q${String(i+1).padStart(2,'0')}</span>
+      <span class="qn-body"><span class="qn-type">${typeLabel[q.type]}</span><span class="qn-text"></span></span>
+    </button>`;
+    li.querySelector('.qn-text').textContent=tmp.textContent;
+    li.querySelector('button').addEventListener('click',()=>{
+      jumpToQuestion(i);
+      if(isNarrow()) setQnavOpen(false);
+    });
+    list.appendChild(li);
+  });
+  document.getElementById('qnav-total').textContent=quizData.length;
+
+  // 今読んでいる問題を一覧側でハイライト（解説HTMLの目次と同じ仕組み）
+  if(cardObserver) cardObserver.disconnect();
+  cardObserver=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return;
+      const idx=+e.target.id.replace('question-','');
+      document.querySelectorAll('.qnav-item').forEach((el,i)=>el.classList.toggle('is-current',i===idx));
+    });
+  },{rootMargin:'-20% 0px -60% 0px'});
+  document.querySelectorAll('.question-card').forEach(c=>cardObserver.observe(c));
+}
+
+function updateQnav(){
+  let answered=0;
+  quizData.forEach((q,i)=>{
+    const state = answers[i]===null ? 'un' : (isCorrect(i) ? 'ok' : 'ng');
+    if(state!=='un') answered++;
+    const item=document.getElementById(`qnav-item-${i}`);
+    item.dataset.state=state;
+    item.hidden = qnavFilter==='unanswered' && state!=='un';
+  });
+  const rest=quizData.length-answered;
+  document.getElementById('qnav-answered').textContent=answered;
+  document.getElementById('qnav-bar-fill').style.width=(answered/quizData.length*100)+'%';
+  document.getElementById('qnav-badge').textContent = rest>0 ? rest : '';
+  document.getElementById('qnav-empty').classList.toggle('show', qnavFilter==='unanswered' && rest===0);
+}
+
+qnavToggle.addEventListener('click',()=>setQnavOpen(qnav.classList.contains('collapsed')));
+qnavBackdrop.addEventListener('click',()=>setQnavOpen(false));
+window.addEventListener('resize',()=>setQnavOpen(!qnav.classList.contains('collapsed')));
+document.querySelectorAll('.qnav-filter button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    qnavFilter=b.dataset.filter;
+    document.querySelectorAll('.qnav-filter button').forEach(x=>{
+      x.classList.toggle('is-active',x===b);
+      x.setAttribute('aria-pressed',String(x===b));
+    });
+    updateQnav();
+  });
+});
 
 document.addEventListener('DOMContentLoaded',initQuiz);
 </script>

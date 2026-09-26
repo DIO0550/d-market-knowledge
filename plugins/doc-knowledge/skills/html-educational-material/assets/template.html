@@ -616,17 +616,17 @@
   }
 </style>
 </head>
-<body>
+<body class="toc-closed">
 
 <div class="progress" id="progress"></div>
 
-<button class="toc-toggle is-open" id="toc-toggle" aria-label="目次を開閉" aria-expanded="true">
+<button class="toc-toggle" id="toc-toggle" aria-label="目次を開閉" aria-expanded="false">
   <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 
 <div class="toc-backdrop" id="toc-backdrop" aria-hidden="true"></div>
 
-<aside class="toc" id="toc">
+<aside class="toc collapsed" id="toc">
   <div class="toc-head">
     <span class="toc-dot"></span>
     <span class="toc-title">Contents</span>
@@ -811,8 +811,8 @@ print(<span class="tok-fn">greet</span>(<span class="tok-str">"world"</span>))  
   const tocToggle=document.getElementById('toc-toggle');
   const tocBackdrop=document.getElementById('toc-backdrop');
   const isNarrow=()=>window.matchMedia('(max-width:1099px)').matches;
-  const TOC_KEY='html_edu_toc_open';
 
+  // 目次はページを開いた時点では常に閉じている（初期状態は HTML 側の collapsed / toc-closed）。開閉状態は保存しない
   const applyState=(open)=>{
     if(open){
       toc.classList.remove('collapsed');
@@ -829,19 +829,10 @@ print(<span class="tok-fn">greet</span>(<span class="tok-str">"world"</span>))  
       tocBackdrop.classList.remove('is-visible');
     }
   };
-  const setOpen=(open)=>{
-    applyState(open);
-    try{localStorage.setItem(TOC_KEY, open?'true':'false');}catch(_){}
-  };
-  let stored=null;
-  try{stored=localStorage.getItem(TOC_KEY);}catch(_){}
-  const defaultOpen = stored!==null ? (stored==='true') : !isNarrow();
-  setOpen(defaultOpen);
-
-  tocToggle.addEventListener('click',()=>setOpen(toc.classList.contains('collapsed')));
-  tocBackdrop.addEventListener('click',()=>setOpen(false));
+  tocToggle.addEventListener('click',()=>applyState(toc.classList.contains('collapsed')));
+  tocBackdrop.addEventListener('click',()=>applyState(false));
   document.querySelectorAll('.toc nav a').forEach(a=>{
-    a.addEventListener('click',()=>{if(isNarrow()) setOpen(false);});
+    a.addEventListener('click',()=>{if(isNarrow()) applyState(false);});
   });
   window.addEventListener('resize',()=>{
     const open=!toc.classList.contains('collapsed');
