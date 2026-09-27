@@ -23,6 +23,13 @@
 ```html
 <body>
   <div class="progress" id="progress"></div>
+  <button class="qnav-toggle" id="qnav-toggle" aria-label="問題一覧を開閉" aria-expanded="false" aria-controls="qnav">
+    <svg>…</svg><span class="qnav-badge" id="qnav-badge"></span>
+  </button>
+  <div class="qnav-backdrop" id="qnav-backdrop"></div>
+  <aside class="qnav collapsed" id="qnav" aria-label="問題一覧">
+    <!-- 回答済み数と進捗バー、「すべて / 未回答のみ」の切替、問題リスト（JSで描画）、凡例 -->
+  </aside>
   <div class="container">
     <header>
       <a class="back-link" href="解説HTMLファイル名.html">Back to notes</a>
@@ -41,9 +48,10 @@
       <p class="submit-hint" id="submit-hint">すべての問題に回答してください</p>
     </div>
     <div class="result-section" id="result-section">
-      <!-- JSで動的に内容を描画 -->
+      <!-- 見出し・スコア・ボタンは静的HTML。スコア・breakdown・メッセージの値はJSが埋める（9章） -->
     </div>
   </div>
+  <button class="unanswered-btn" id="unanswered-btn" onclick="jumpToNextUnanswered()" hidden>未回答 N 問 ↓</button>
   <button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()">↑</button>
   <script>/* quizData と 全ロジック */</script>
 </body>
@@ -52,6 +60,7 @@
 - 最大幅 `780px` 中央寄せ。解説HTMLより狭い（回答に集中させる）
 - 問題カードはJS（`renderAll()`）で動的に描画される
 - `back-link` と結果画面の「解説を見る」ボタンは、対応する解説HTMLへのリンクを設定する
+- `#qnav`（問題一覧サイドバー）と `#unanswered-btn` は、未回答の問題を探して移動するための導線（10章「未回答の問題を探す導線」）
 
 ---
 
@@ -429,6 +438,7 @@ function countByType(){
 - `answers` 配列をクリア
 - `sortOrders` を再シャッフル
 - 全問題カードを再描画（回答状態・フィードバック・正誤クラスがクリア）
+- 「結果を見る」ボタンを無効に戻し、問題一覧と未回答ボタンを全問未回答の状態で描き直す
 - ページ最上部へスクロール
 
 ---
@@ -446,6 +456,23 @@ function countByType(){
 | 結果画面スコア | 0→正解数へカウントアップ | `requestAnimationFrame` + easeOutQuad |
 | `.feedback` 出現 | フェードイン + 下から8pxスライド | `@keyframes fadeIn` |
 | `.result-section` 出現 | 同上 | `@keyframes fadeIn` |
+| 問題一覧の開閉 | 左からスライド（広い画面では本文が右へ寄る） | `transition:transform .28s` / `padding-left .28s` |
+| 問題一覧の現在地 | 読んでいる問題の行を青くハイライト | `IntersectionObserver` |
+| 問題への移動 | 移動先のカードの輪郭が一度だけ光る（1.2s） | `@keyframes jump-pulse` |
+
+### 未回答の問題を探す導線
+
+問題が多いと、どれに答えていないかをスクロールして探すことになる。テンプレートには2つの導線がある。
+
+- **問題一覧サイドバー**（`#qnav`）: 全体を見渡すためのもの。解説HTMLの目次と同じく、左上のボタンで開閉し、ページを開いた時点では閉じている
+  - 閉じている間も、開閉ボタンのバッジに未回答数が出る
+  - 各行は問題番号・問題タイプ・問題文の冒頭2行。番号の枠で状態を示す（未回答＝青枠、正解＝緑 ✓、不正解＝赤 ✗）。回答済みの行は文字を薄くする
+  - 上部に回答済み数と進捗バー。「すべて / 未回答のみ」で表示を切り替えられる
+  - 行を押すとその問題へ移動する。狭い画面（1099px 以下）では一覧を重ねて表示し、移動すると閉じる
+  - 広い画面では、開くと本文が一覧の幅だけ右へ寄り、重ならない
+- **画面下部中央の「未回答 N 問 ↓」ボタン**（`#unanswered-btn`）: 一覧を開かずに次へ進むためのもの。読んでいる問題より後ろにある未回答の問題へスクロールし、後ろに無ければ先頭の未回答へ戻る。全問回答すると消える
+
+移動先のカードにはフォーカスが移り（カードは `tabindex="-1"`）、`.jump-highlight` で輪郭が光る。一覧は `initQuiz()` の中で `renderQnav()` が作り、回答のたびに `checkAllAnswered()` → `updateUnansweredNav()` → `updateQnav()` の順で状態を描き直す。
 
 ### カウントアップの実装
 

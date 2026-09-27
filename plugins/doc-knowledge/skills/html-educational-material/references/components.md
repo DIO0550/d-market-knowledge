@@ -1,6 +1,6 @@
 # コンポーネントリファレンス
 
-新テンプレート（学術ノート風ライトテーマ）のコンポーネント集。HTMLパターンとCSSクラスの使い方を詳細に示す。
+テンプレート（学術ノート風ライトテーマ）のコンポーネント集。HTMLパターンとCSSクラスの使い方を詳細に示す。
 
 ## 目次
 
@@ -39,13 +39,14 @@
 ### TOC Toggle ボタンとBackdrop
 
 ```html
-<button class="toc-toggle is-open" id="toc-toggle" aria-label="目次を開閉" aria-expanded="true">
+<button class="toc-toggle" id="toc-toggle" aria-label="目次を開閉" aria-expanded="false">
   <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 <div class="toc-backdrop" id="toc-backdrop" aria-hidden="true"></div>
 ```
 
 - TOC開閉ボタンは左上に固定。TOC展開時はTOC右端に重ねて表示される
+- ページを開いた時点では TOC は閉じている。初期状態は HTML 側で持つ（`<body class="toc-closed">`・`<aside class="toc collapsed">`・ボタンの `aria-expanded="false"`）
 - Backdropは狭いビューポート（`max-width:1099px`）でTOCがオーバーレイ表示になったときの背景
 
 ---
@@ -82,7 +83,7 @@
 ## 3. 左サイドバーTOC
 
 ```html
-<aside class="toc" id="toc">
+<aside class="toc collapsed" id="toc">
   <div class="toc-head">
     <span class="toc-dot"></span>
     <span class="toc-title">Contents</span>
@@ -104,7 +105,7 @@
 - `.num` にはセクション番号（`01`, `02`...）を入れる。概要・Summary は `—` でOK
 - アクティブ項目は左側に3px幅の青い縦線が表示される（`::before` で実装）
 - 狭いビューポートではオーバーレイモードに切り替わり、Backdropクリックで閉じる
-- TOC開閉状態は localStorage に保存される
+- 開閉状態は保存しない。どの教材も閉じた状態で開く
 
 ---
 
@@ -117,9 +118,7 @@
     <p>トピックの全体像を説明する段落。<strong>重要キーワード</strong> は strong で強調。</p>
     <div class="ov-grid">
       <div class="ov-item">
-        <div class="ov-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        </div>
+        <div class="ov-icon emoji">🧩</div>
         <div><h4>ポイント1</h4><p>簡潔な説明</p></div>
       </div>
       <!-- 必要なだけ .ov-item を繰り返す -->
@@ -142,9 +141,7 @@
 ```html
 <section class="ct" id="sec-1">
   <div class="sec-head">
-    <div class="sec-icon">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>
-    </div>
+    <div class="sec-icon">📖</div>
     <h2><span class="num">01</span>セクションタイトル</h2>
   </div>
   <p>本文段落。<span class="term">専門用語</span>には .term クラス。</p>
@@ -164,7 +161,7 @@
 
 ## 6. Callout（情報ボックス）
 
-4種類のバリエーションがある。すべてホバーで左ボーダーが `3px → 5px` に太化する。
+4種類のバリエーションがある。すべてホバーで浮き上がり、影がつく。
 
 ### Def（用語定義）— 青
 
@@ -393,9 +390,7 @@
 ```html
 <section id="sec-summary" class="summary">
   <div class="summary-head">
-    <div class="summary-icon">
-      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    </div>
+    <div class="summary-icon emoji">🎓</div>
     <div>
       <div class="subt">Key Takeaways</div>
       <h3>まとめ</h3>

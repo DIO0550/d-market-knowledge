@@ -27,7 +27,7 @@ description: 技術教育・解説資料用のHTML作成スキル。暗号技術
 
 - **タイポグラフィ**: 本文はセリフ体（Source Serif 4 + Noto Serif JP）、UI・コードはサンセリフ/モノスペース（Inter + JetBrains Mono）
 - **カラー**: 柔らかな青（#2c5aa0）を主軸に、情報・警告・OK・危険をセマンティック色で区別
-- **レイアウト**: 左固定TOC（260px）+ 本文（最大1180px）。狭い画面ではTOCがオーバーレイ化
+- **レイアウト**: 左固定TOC（260px。ページを開いた時点では閉じている）+ 本文（最大1180px）。狭い画面ではTOCがオーバーレイ化
 - **質感**: 白基調の用紙感、控えめな罫線、微かな影
 
 ## 基本構造
@@ -42,11 +42,11 @@ description: 技術教育・解説資料用のHTML作成スキル。暗号技術
     <!-- フォント: Source Serif 4, Inter, JetBrains Mono, Noto Serif JP, Noto Sans JP -->
     <style>/* CSS変数とスタイル */</style>
 </head>
-<body>
+<body class="toc-closed">
     <div class="progress" id="progress"></div>
-    <button class="toc-toggle is-open" id="toc-toggle">...</button>
+    <button class="toc-toggle" id="toc-toggle" aria-expanded="false">...</button>
     <div class="toc-backdrop" id="toc-backdrop"></div>
-    <aside class="toc" id="toc">...</aside>
+    <aside class="toc collapsed" id="toc">...</aside>
     <div class="page shift">
         <article>
             <header class="title-block">...</header>
@@ -107,7 +107,7 @@ description: 技術教育・解説資料用のHTML作成スキル。暗号技術
 
 ### 構造要素
 
-- `.toc` - 左サイドバー目次（折りたたみ可・スクロール連動ハイライト）
+- `.toc` - 左サイドバー目次（初期状態は閉じている・開閉可・スクロール連動ハイライト）
 - `.title-block` - タイトル・リード文・メタ情報
 - `.ov-section` + `.ov-box` - 概要セクション
 - `section.ct` - 通常のコンテンツセクション（`.sec-head` + 本文）
@@ -217,20 +217,7 @@ description: 技術教育・解説資料用のHTML作成スキル。暗号技術
 
 不要な派手さを避け、学習を補助する方向に絞る。全てのインタラクションは `prefers-reduced-motion: reduce` 時に無効化される。
 
-**解説HTML側:**
-
-1. `.ov-item` ホバー：背景色変化 + 微小な浮き上がり
-2. `.callout` ホバー：浮き上がり + 影（クリーンな持ち上がり感）
-3. `.term` ホバー：背景色がつく + 下線が実線化
-4. `.summary-item` ホバー：浮き上がり + 影 + ボーダー色変化
-5. TOC項目のアクティブ切替：滑らかなテキスト色遷移
-
-**クイズHTML側:**
-
-1. `.option` ホバー：`translateX(2px)` で右にスライド
-2. 正誤判定時：カードが一瞬フラッシュ（`flash-correct` / `flash-incorrect` アニメ）
-3. `.sort-item.dragging`：微回転 + スケール + 影（ドラッグ物理感）
-4. 結果画面のスコア数字：0から正解数までカウントアップ（800ms）
+テンプレートに実装済みのインタラクションは、解説HTML側が [references/components.md](references/components.md) の「インタラクション一覧」、クイズHTML側が [references/quiz-components.md](references/quiz-components.md) の「10. インタラクション仕様」にまとまっている。
 
 ## デザイン原則
 
@@ -255,6 +242,8 @@ description: 技術教育・解説資料用のHTML作成スキル。暗号技術
 - **1画面全問表示**: 全問を1ページにまとめて表示
 - **即時フィードバック**: 選択時にその場で正誤と解説を表示
 - **回答済み数の表示**: ヘッダーに進捗を表示
+- **問題一覧サイドバー**: 左上のボタンで開く（初期状態は閉じている）。各問題の回答状況（未回答・正解・不正解）が一覧でき、「未回答のみ」に絞り込める。押した問題へ移動する
+- **未回答へのジャンプ**: 画面下部の「未回答 N 問」ボタンで次の未回答の問題へ移動できる
 - **結果画面**: 全問回答後に正答率・問題タイプ別breakdown・評価メッセージを表示
 - **リトライ機能**: もう一度挑戦ボタン（回答・シャッフルともにリセット）
 
