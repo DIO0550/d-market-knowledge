@@ -3,6 +3,38 @@
 技術参考書の図は**インラインSVG**で描く。ベクタなので拡大しても劣化せず、
 PDF内でテキストとして保持されるため検索にも引っかかる。
 
+## 目次
+
+- 教科書での図の選び方
+- 鉄則：スタイルはSVGの中に書く
+- 共通スタイル
+- 寸法の決め方
+- 対象の流れと独立した状態
+- パターン1：構成図（往復のやり取り）
+- パターン2：シーケンス図（時間の流れ）
+- パターン3：レイヤ図（階層構造）
+- パターン4：フロー図（分岐のある処理）
+- アイコン集（セキュリティ図・構成図用）
+- パターン5：攻撃フロー図（中間者攻撃）
+- 確認事項
+
+## 教科書での図の選び方
+
+明朝体の本文を読み進めながら関係を確認できるよう、図は説明する段落の近くに置く。
+図の文字はゴシック体、主色は紺、背景は淡い青灰色とし、本文の見出しと対応させる。
+
+| 本文で伝えたいこと | 図で示す関係 |
+|---|---|
+| 何がどこへ渡るか | 対象と、操作名を付けた矢印 |
+| 複数の対象がどう対応するか | 対象同士の接続とラベル |
+| 操作の前後で何が変わるか | 前後の状態と、変化した箇所 |
+| 似た概念の違い | 同じ観点で並べた対比 |
+
+- 1図1テーマ。別の関係は図を分け、キャプションで読み取る点を示す。
+- 手順番号は流れを追う補助に使う。図表番号は `figure.fig` の自動採番に任せる。
+- 本文の用語と図のラベルを揃え、色だけに意味を持たせない。
+- 図を増やすときも本文の説明を省略せず、図から分かることを文章で確認する。
+
 ## 鉄則：スタイルはSVGの中に書く
 
 **WeasyPrintは外部CSS（`book.css`）をインラインSVGに適用しない。**
@@ -12,13 +44,13 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 
 ```html
 <!-- 1. SVG内の<style>（要素数が多い図に向く） -->
-<svg viewBox="0 0 420 150"><style>.box { fill: #e8f0f9; stroke: #1b4f8a; }</style>…</svg>
+<svg viewBox="0 0 420 150"><style>.box { fill: #edf2f7; stroke: #244d78; }</style>…</svg>
 
 <!-- 2. 属性で直接指定（単純な図に向く） -->
-<rect fill="#e8f0f9" stroke="#1b4f8a" stroke-width="1.2"/>
+<rect fill="#edf2f7" stroke="#244d78" stroke-width="1.2"/>
 
 <!-- 3. <g>でまとめて継承（同じ体裁の要素が並ぶとき） -->
-<g fill="#e8f0f9" stroke="#1b4f8a" stroke-width="1.2">…</g>
+<g fill="#edf2f7" stroke="#244d78" stroke-width="1.2">…</g>
 ```
 
 ## 共通スタイル
@@ -27,20 +59,20 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 
 ```html
 <style>
-  .box   { fill: #e8f0f9; stroke: #1b4f8a; stroke-width: 1.2; }
-  .box-w { fill: #ffffff; stroke: #1b4f8a; stroke-width: 1.2; }
+  .box   { fill: #edf2f7; stroke: #244d78; stroke-width: 1.2; }
+  .box-w { fill: #ffffff; stroke: #244d78; stroke-width: 1.2; }
   .box-a { fill: #fff7e6; stroke: #e0a94a; stroke-width: 1.2; }
-  .line  { stroke: #1b4f8a; stroke-width: 1.4; fill: none; }
-  .dash  { stroke: #1b4f8a; stroke-width: 1.2; fill: none; stroke-dasharray: 5 3; }
-  .thin  { stroke: #c8ced6; stroke-width: 0.8; fill: none; }
-  .t     { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #1a1a1a; }
-  .t-s   { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #5a5f66; }
-  .t-b   { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #1b4f8a; font-weight: 700; }
+  .line  { stroke: #244d78; stroke-width: 1.4; fill: none; }
+  .dash  { stroke: #244d78; stroke-width: 1.2; fill: none; stroke-dasharray: 5 3; }
+  .thin  { stroke: #bccbd7; stroke-width: 0.8; fill: none; }
+  .t     { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #263645; }
+  .t-s   { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #607383; }
+  .t-b   { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #244d78; font-weight: 700; }
 </style>
 <defs>
   <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-    <path d="M0,0 L10,5 L0,10 z" fill="#1b4f8a"/>
+    <path d="M0,0 L10,5 L0,10 z" fill="#244d78"/>
   </marker>
 </defs>
 ```
@@ -56,13 +88,16 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 - 高さは内容次第だが、**420×280を超えると1ページに収まりにくい**。超えるなら図を分割する。
 
 **文字サイズは版面幅で圧縮されることを忘れない。** `viewBox` 幅420が版面幅に収まるので、
-指定したpx値はそのまま出ない。実寸は次のとおり。
+指定したpx値はそのまま出ない。従来の外側注釈用余白を取る設定での実寸は次のとおり。
 
 | SVGの指定 | a4 | b5 | a5 |
 |---|---|---|---|
 | `font-size: 11px` | 10.2pt | 8.8pt | 7.2pt |
 | `font-size: 9px`  | 8.4pt  | 7.2pt | 5.9pt |
 | `font-size: 7.5px`| 7.0pt  | 6.0pt | 4.9pt |
+
+`--no-sidenotes` では版面が広くなるため、この表より大きく表示される。
+計算式は `SVG内のfont-size × 版面幅(pt) ÷ viewBox幅`。最終PDFで読めるかを確認する。
 
 **主ラベルは11px、補助ラベルは9px**を下限とする。7.5pxはb5で6pt、a5で5ptまで潰れて
 印刷では読めない。a5で図を多用するなら `viewBox` 幅を340まで狭めて相対的に文字を大きくする。
@@ -73,13 +108,13 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 <figure class="fig">
 <svg viewBox="0 0 420 110" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .box { fill: #e8f0f9; stroke: #1b4f8a; stroke-width: 1.2; }
-    .t { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #1a1a1a; }
-    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #5a5f66; }
+    .box { fill: #edf2f7; stroke: #244d78; stroke-width: 1.2; }
+    .t { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #263645; }
+    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #607383; }
   </style>
   <defs><marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5"
         markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-    <path d="M0,0 L10,5 L0,10 z" fill="#1b4f8a"/></marker></defs>
+    <path d="M0,0 L10,5 L0,10 z" fill="#244d78"/></marker></defs>
 
   <rect class="box" x="10" y="30" width="110" height="50" rx="4"/>
   <text class="t" x="65" y="60" text-anchor="middle">クライアント</text>
@@ -88,10 +123,10 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
   <text class="t" x="355" y="60" text-anchor="middle">サーバ</text>
 
   <line x1="125" y1="46" x2="295" y2="46"
-        stroke="#1b4f8a" stroke-width="1.4" marker-end="url(#ah1)"/>
+        stroke="#244d78" stroke-width="1.4" marker-end="url(#ah1)"/>
   <text class="t-s" x="210" y="40" text-anchor="middle">リクエスト</text>
 
-  <line x1="295" y1="66" x2="125" y2="66" stroke="#1b4f8a" stroke-width="1.2"
+  <line x1="295" y1="66" x2="125" y2="66" stroke="#244d78" stroke-width="1.2"
         stroke-dasharray="5 3" marker-end="url(#ah1)"/>
   <text class="t-s" x="210" y="80" text-anchor="middle">レスポンス</text>
 </svg>
@@ -107,15 +142,15 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 <figure class="fig">
 <svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .head { fill: #1b4f8a; }
+    .head { fill: #244d78; }
     .ht { font-family: "Noto Sans CJK JP"; font-size: 10px; fill: #ffffff; }
-    .life { stroke: #c8ced6; stroke-width: 0.8; stroke-dasharray: 3 3; }
-    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #1a1a1a; }
+    .life { stroke: #bccbd7; stroke-width: 0.8; stroke-dasharray: 3 3; }
+    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #263645; }
     .num { font-family: "Noto Sans CJK JP"; font-size: 8.5px; fill: #ffffff; }
   </style>
   <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5"
         markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-    <path d="M0,0 L10,5 L0,10 z" fill="#1b4f8a"/></marker></defs>
+    <path d="M0,0 L10,5 L0,10 z" fill="#244d78"/></marker></defs>
 
   <rect class="head" x="20" y="8" width="110" height="24" rx="3"/>
   <text class="ht" x="75" y="24" text-anchor="middle">ブラウザ</text>
@@ -127,14 +162,14 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 
   <!-- 1本のやり取り = 矢印 + 番号バッジ + ラベル。y座標を40ずつ下げて繰り返す -->
   <line x1="75" y1="60" x2="345" y2="60"
-        stroke="#1b4f8a" stroke-width="1.4" marker-end="url(#ah2)"/>
-  <circle cx="88" cy="52" r="7" fill="#1b4f8a"/>
+        stroke="#244d78" stroke-width="1.4" marker-end="url(#ah2)"/>
+  <circle cx="88" cy="52" r="7" fill="#244d78"/>
   <text class="num" x="88" y="55" text-anchor="middle">1</text>
   <text class="t-s" x="210" y="55" text-anchor="middle">GET /index.html</text>
 
-  <line x1="345" y1="100" x2="75" y2="100" stroke="#1b4f8a" stroke-width="1.2"
+  <line x1="345" y1="100" x2="75" y2="100" stroke="#244d78" stroke-width="1.2"
         stroke-dasharray="5 3" marker-end="url(#ah2)"/>
-  <circle cx="332" cy="92" r="7" fill="#1b4f8a"/>
+  <circle cx="332" cy="92" r="7" fill="#244d78"/>
   <text class="num" x="332" y="95" text-anchor="middle">2</text>
   <text class="t-s" x="210" y="95" text-anchor="middle">200 OK + HTML</text>
 </svg>
@@ -150,13 +185,13 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 <figure class="fig">
 <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .l { stroke: #1b4f8a; stroke-width: 1.2; }
-    .t { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #1a1a1a; }
-    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #5a5f66; }
+    .l { stroke: #244d78; stroke-width: 1.2; }
+    .t { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #263645; }
+    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #607383; }
   </style>
   <rect class="l" x="60" y="10"  width="300" height="34" fill="#d6e4f2"/>
   <text class="t" x="210" y="31" text-anchor="middle">アプリケーション層（HTTP）</text>
-  <rect class="l" x="60" y="44"  width="300" height="34" fill="#e8f0f9"/>
+  <rect class="l" x="60" y="44"  width="300" height="34" fill="#edf2f7"/>
   <text class="t" x="210" y="65" text-anchor="middle">トランスポート層（TCP）</text>
   <rect class="l" x="60" y="78"  width="300" height="34" fill="#f2f6fb"/>
   <text class="t" x="210" y="99" text-anchor="middle">インターネット層（IP）</text>
@@ -175,31 +210,31 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 <figure class="fig">
 <svg viewBox="0 0 420 190" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .box { fill: #e8f0f9; stroke: #1b4f8a; stroke-width: 1.2; }
+    .box { fill: #edf2f7; stroke: #244d78; stroke-width: 1.2; }
     .dec { fill: #fff7e6; stroke: #e0a94a; stroke-width: 1.2; }
-    .t { font-family: "Noto Sans CJK JP"; font-size: 10px; fill: #1a1a1a; }
-    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #5a5f66; }
+    .t { font-family: "Noto Sans CJK JP"; font-size: 10px; fill: #263645; }
+    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #607383; }
   </style>
   <defs><marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5"
         markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-    <path d="M0,0 L10,5 L0,10 z" fill="#1b4f8a"/></marker></defs>
+    <path d="M0,0 L10,5 L0,10 z" fill="#244d78"/></marker></defs>
 
   <rect class="box" x="150" y="8" width="120" height="30" rx="4"/>
   <text class="t" x="210" y="27" text-anchor="middle">リクエスト受信</text>
   <line x1="210" y1="38" x2="210" y2="58"
-        stroke="#1b4f8a" stroke-width="1.4" marker-end="url(#ah4)"/>
+        stroke="#244d78" stroke-width="1.4" marker-end="url(#ah4)"/>
 
   <path class="dec" d="M210,60 L290,95 L210,130 L130,95 z"/>
   <text class="t" x="210" y="98" text-anchor="middle">キャッシュあり？</text>
 
   <line x1="290" y1="95" x2="345" y2="95"
-        stroke="#1b4f8a" stroke-width="1.4" marker-end="url(#ah4)"/>
+        stroke="#244d78" stroke-width="1.4" marker-end="url(#ah4)"/>
   <text class="t-s" x="317" y="88" text-anchor="middle">Yes</text>
   <rect class="box" x="345" y="78" width="70" height="34" rx="4"/>
   <text class="t" x="380" y="99" text-anchor="middle">再利用</text>
 
   <line x1="210" y1="130" x2="210" y2="152"
-        stroke="#1b4f8a" stroke-width="1.4" marker-end="url(#ah4)"/>
+        stroke="#244d78" stroke-width="1.4" marker-end="url(#ah4)"/>
   <text class="t-s" x="222" y="145">No</text>
   <rect class="box" x="150" y="152" width="120" height="30" rx="4"/>
   <text class="t" x="210" y="171" text-anchor="middle">オリジンへ問い合わせ</text>
@@ -259,7 +294,7 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
   <g id="lock">
     <rect x="5" y="20" width="30" height="26" rx="3"/>
     <path d="M11,20 L11,13 C11,8 15,4 20,4 C25,4 29,8 29,13 L29,20"
-          fill="none" stroke="#1b4f8a" stroke-width="4"/>
+          fill="none" stroke="#244d78" stroke-width="4"/>
     <circle cx="20" cy="31" r="3.5" fill="#ffffff"/>
     <rect x="18.5" y="31" width="3" height="8" fill="#ffffff"/>
   </g>
@@ -281,12 +316,12 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 呼び出しはこう書く。
 
 ```html
-<use href="#person" x="10" y="95" fill="#1b4f8a"/>
+<use href="#person" x="10" y="95" fill="#244d78"/>
 <use href="#attacker" x="190" y="80" fill="#b3541e"/>
 ```
 
 `#lock` の掛け金だけは `stroke` を直書きしているので、主色を変えたときは
-`stroke="#1b4f8a"` の値も合わせて書き換える。
+`stroke="#244d78"` の値も合わせて書き換える。
 
 ## パターン5：攻撃フロー図（中間者攻撃）
 
@@ -297,8 +332,8 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 <figure class="fig">
 <svg viewBox="0 0 420 175" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .t   { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #1a1a1a; }
-    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #5a5f66; }
+    .t   { font-family: "Noto Sans CJK JP"; font-size: 11px; fill: #263645; }
+    .t-s { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #607383; }
     .t-w { font-family: "Noto Sans CJK JP"; font-size: 9px; fill: #b3541e; font-weight: 700; }
     .num { font-family: "Noto Sans CJK JP"; font-size: 8.5px; fill: #ffffff; }
   </style>
@@ -321,9 +356,9 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
   <!-- 「直接つながっていると信じている」を示す破線ブラケット -->
   <text class="t-w" x="210" y="14" text-anchor="middle">利用者もサーバも「相手と直接つながっている」と信じている</text>
   <path d="M30,58 L30,22 L388,22 L388,58" fill="none"
-        stroke="#c8ced6" stroke-width="0.8" stroke-dasharray="3 3"/>
+        stroke="#bccbd7" stroke-width="0.8" stroke-dasharray="3 3"/>
 
-  <use href="#p1" x="10" y="79" fill="#1b4f8a"/>
+  <use href="#p1" x="10" y="79" fill="#244d78"/>
   <text class="t" x="30" y="144" text-anchor="middle">利用者</text>
 
   <rect x="160" y="54" width="100" height="76" rx="4" fill="#fdf1e7"
@@ -331,7 +366,7 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
   <use href="#a1" x="190" y="64" fill="#b3541e"/>
   <text class="t-w" x="210" y="126" text-anchor="middle">攻撃者（中間者）</text>
 
-  <use href="#s1" x="370" y="79" fill="#1b4f8a"/>
+  <use href="#s1" x="370" y="79" fill="#244d78"/>
   <text class="t" x="388" y="144" text-anchor="middle">Webサーバ</text>
 
   <line x1="55" y1="89" x2="155" y2="89" stroke="#b3541e" stroke-width="1.5" marker-end="url(#ah5)"/>
@@ -368,3 +403,10 @@ PDF内でテキストとして保持されるため検索にも引っかかる�
 - 図が版面をはみ出していないか — `viewBox` の高さが280を超えていたら分割する
 - **線と文字が重なっていないか** — 補助線の端点はラベルの上端から10単位以上離す。
   和文ラベルの高さは `font-size` とほぼ同じ、幅は `font-size × 文字数` で見積もる
+
+## 対象の流れと独立した状態
+
+完成例の `templates/textbook-sample.html` には、イメージの作成・共有・取得と、
+ローカルと配備先の実行環境を分けて示す図を含む。追跡する対象を矢印で結び、
+移動しないもの・実行状態が独立しているものは別の枠で表現する。
+図の下には同じ対象を比較する小さな図を置き、全体の流れと局所的な違いを分けて説明する。

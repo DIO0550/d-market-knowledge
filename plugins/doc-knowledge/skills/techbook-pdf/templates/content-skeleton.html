@@ -15,12 +15,36 @@
 
   <h2>節タイトル</h2>
 
+  <p class="section-lead">この節で理解する関係を1文で示す。</p>
+
+  <div class="text-with-note">
+    <div class="note-body">
   <p>本文。<span class="idx" data-term="用語" data-yomi="ようご">用語</span>はこのように索引語としてマークする<span class="snref">※1</span>。</p>
 
+    </div>
   <aside class="sidenote">
     <span class="sn-label">※1</span>
-    側注は参照した段落の直後に置く。
+    本文を補う短い定義を置く。
   </aside>
+  </div>
+
+  <!-- 説明の近くに、対象と操作の関係を示す。実際の題材の用語に置き換える。 -->
+  <figure class="fig">
+    <svg viewBox="0 0 420 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="418" height="98" rx="6" fill="#edf2f7"/>
+      <rect x="16" y="27" width="124" height="49" rx="4" fill="#244d78"/>
+      <rect x="280" y="27" width="124" height="49" rx="4" fill="#ffffff" stroke="#9bb6cd"/>
+      <text x="78" y="57" text-anchor="middle" fill="#ffffff"
+            font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13">入力</text>
+      <text x="342" y="57" text-anchor="middle" fill="#244d78"
+            font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13">結果</text>
+      <path d="M140 52H280" stroke="#244d78" stroke-width="1.5" fill="none"/>
+      <path d="M280 52l-8 -4v8z" fill="#244d78"/>
+      <text x="210" y="40" text-anchor="middle" fill="#244d78"
+            font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="12">操作</text>
+    </svg>
+    <figcaption>操作によって入力が結果へ変わる関係</figcaption>
+  </figure>
 
   <div class="callout point">
     <p class="co-title"></p>

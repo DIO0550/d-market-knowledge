@@ -1,6 +1,6 @@
 ---
 name: techbook-pdf
-description: 技術参考書・教科書スタイルのPDFを生成するスキル。HTMLと印刷用CSS（WeasyPrint）で、表紙・章扉・ページ番号つき自動目次・柱（ランニングヘッド）・ノンブル・側注・POINT囲み・例題・章末演習問題・コラム・図表番号・自動索引を備えた日本語組版のPDFを組む。A4/B5/A5の判型プリセットに対応。「参考書っぽいPDF」「技術書風のPDF」「教科書みたいなPDF」「HTMLからPDF」「書籍レイアウト」「章立てのPDF資料」「索引付きPDF」「印刷用の解説書」「テキスト教材のPDF」などのキーワードでトリガー。通読させる解説資料をPDFで作る場面では積極的に使用すること。画面で読ませるHTML教材は html-educational-material が担当する。
+description: 明朝体の本文・紺色の見出しと豊富な図解を組み合わせた技術参考書・教科書スタイルのPDFを生成するスキル。HTMLと印刷用CSS（WeasyPrint）で、表紙・章扉・ページ番号つき自動目次・柱（ランニングヘッド）・ノンブル・側注・POINT囲み・例題・章末演習問題・コラム・図表番号・自動索引を備えた日本語組版のPDFを組む。A4/B5/A5の判型プリセットに対応。「参考書っぽいPDF」「技術書風のPDF」「教科書みたいなPDF」「HTMLからPDF」「書籍レイアウト」「章立てのPDF資料」「索引付きPDF」「印刷用の解説書」「テキスト教材のPDF」などのキーワードでトリガー。通読させる解説資料をPDFで作る場面では積極的に使用すること。画面で読ませるHTML教材は html-educational-material が担当する。
 ---
 
 # techbook-pdf
@@ -10,7 +10,7 @@ description: 技術参考書・教科書スタイルのPDFを生成するスキ�
 
 ## ワークフロー
 
-1. **判型と構成を決める** — 未指定なら `b5`（技術書の標準判型）。章立てをユーザーと合意する。
+1. **判型と構成を決める** — 未指定なら `a4`（図と本文を並べて読みやすい判型）。章立てをユーザーと合意する。
 2. **本文HTML断片を書く** — `<section class="chapter">` の並びだけを書く。`<html>` や `<head>` は書かない。骨格は [templates/content-skeleton.html](templates/content-skeleton.html)、各部品の書式は [references/components.md](references/components.md)。
    概念の説明には**図を積極的に入れる**。インラインSVGのパターン集（構成図・シーケンス図・レイヤ図・
    フロー図・攻撃フロー図、および人物／攻撃者／サーバ等のアイコン集）は
@@ -23,7 +23,7 @@ description: 技術参考書・教科書スタイルのPDFを生成するスキ�
 
 ```bash
 python3 scripts/build_pdf.py content.html -o book.pdf \
-  --preset b5 \
+  --preset a4 --no-sidenotes \
   --title "実践Webプロトコル入門" \
   --subtitle "HTTPからTLSまで、手を動かして理解する" \
   --kicker "TECH REFERENCE"
@@ -31,15 +31,38 @@ python3 scripts/build_pdf.py content.html -o book.pdf \
 
 | オプション | 既定 | 用途 |
 |---|---|---|
-| `--preset` | `b5` | `a4` / `b5` / `a5` |
-| `--accent` | `#1b4f8a` | 主色。`--accent-weak` は淡色（囲み背景）を必ず対で指定する |
+| `--preset` | `a4` | `a4` / `b5` / `a5` |
+| `--accent` | `#244d78` | 主色。`--accent-weak` は淡色（囲み背景）を必ず対で指定する |
 | `--toc-depth` | `2` | 目次に載せる見出しの深さ（1〜3） |
 | `--author` / `--meta` | — | 表紙の著者名 / 刊記（版数・年）。**任意**。どちらも無ければ表紙下部ごと省かれる |
 | `--kicker` | — | 表紙上部の小見出し（`TECH REFERENCE` など） |
 | `--no-cover` / `--no-toc` / `--no-index` | — | 各パートを省く |
-| `--no-sidenotes` | — | 側注を使わない。外マージンが狭い左右対称の版面になる |
+| `--no-sidenotes` | — | 外側の側注専用余白をなくす。`.text-with-note` の注釈は本文の横に表示できる |
 | `--keep-html` | — | 中間HTMLを残す。崩れの原因調査に使う |
 | `--install-deps` | — | 不足依存をロックから `.venv` に導入する（下記） |
+
+## 標準のデザインと教材構成
+
+明朝体の説明本文、紺色のゴシック見出し、短い欄外注を基本とし、関係を理解するための図を添える。
+本文は「概念の説明 → 図 → 図の読み解き・具体例 → 要点」の順を基本にする。
+図を先に見る方が分かりやすい節では順序を入れ替えてよい。学習目的でも本文を穴埋めや暗記カードに置き換えない。
+
+- 標準例は `--preset a4 --no-sidenotes`。注釈は `.text-with-note` にまとめ、図・表は版面全幅で置く。
+- `.section-lead` に節の要旨を1文で書く。見出しや本文の繰り返しではなく、何を理解する節かを示す。
+- 処理の流れ、対象の対応、状態の変化、混同しやすい比較には図を使う。1図では1つの関係に絞り、本文と同じ用語を使う。
+- 矢印には操作や受け渡すものを添え、必要なら手順番号を付ける。図表番号は従来どおり自動採番する。
+- 図の下に短いキャプション、誤解しやすい点には淡い金色のPOINTを置く。演習は章末にまとめる。
+- ページを埋めるための装飾図や固定の図数は設けない。短い段落の近くに図を置き、縮小で詰め込まず分割する。
+
+実際にビルドできる完成例は [templates/textbook-sample.html](templates/textbook-sample.html)。
+生成済みの見本は [templates/textbook-sample.pdf](templates/textbook-sample.pdf)（A4・7ページ）。
+表紙・目次・索引・リンクを含めて検証するときもこの例を使える。
+見本のHTMLや共通CSSを変更した場合は、見本PDFも再生成して目視確認する。
+
+```bash
+python3 scripts/build_pdf.py templates/textbook-sample.html -o textbook.pdf \
+  --preset a4 --no-sidenotes --title "コンテナの基本" --keep-html
+```
 
 ## 依存とその導入
 
@@ -141,6 +164,7 @@ WeasyPrint 一式を維持する CourtBouillon への移管で、配布物は `C
 |---|---|
 | `.callout.point` / `.warn` / `.note` | POINT囲み / 注意 / 補足 |
 | `.sidenote` + `.snref` | 側注と本文中の参照マーク |
+| `.section-lead` / `.text-with-note` | 節の要旨 / 本文と短い注釈を並べる |
 | `.termbox` | 用語定義 |
 | `.example` | 例題（問題＋解答が一体） |
 | `.exercises` / `.answers` | 章末演習問題 / 巻末解答 |
