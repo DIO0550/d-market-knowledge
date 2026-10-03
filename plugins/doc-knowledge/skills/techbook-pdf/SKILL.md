@@ -55,7 +55,9 @@ python3 scripts/build_pdf.py content.html -o book.pdf \
 - ページを埋めるための装飾図や固定の図数は設けない。短い段落の近くに図を置き、縮小で詰め込まず分割する。
 
 実際にビルドできる完成例は [templates/textbook-sample.html](templates/textbook-sample.html)。
+生成済みの見本は [templates/textbook-sample.pdf](templates/textbook-sample.pdf)（A4・7ページ）。
 表紙・目次・索引・リンクを含めて検証するときもこの例を使える。
+見本のHTMLや共通CSSを変更した場合は、見本PDFも再生成して目視確認する。
 
 ```bash
 python3 scripts/build_pdf.py templates/textbook-sample.html -o textbook.pdf \
