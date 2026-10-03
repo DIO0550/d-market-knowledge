@@ -5,14 +5,14 @@
    ========================================================= */
 
 :root {
-  --accent:        #1b4f8a;   /* 主色: 見出し・罫 */
-  --accent-weak:   #e8f0f9;   /* 主色の淡色: 囲み背景 */
-  --ink:           #1a1a1a;   /* 本文墨 */
-  --ink-weak:      #5a5f66;   /* 側注・キャプション */
-  --rule:          #c8ced6;   /* 細罫 */
+  --accent:        #244d78;   /* 主色: 見出し・罫 */
+  --accent-weak:   #edf2f7;   /* 主色の淡色: 囲み背景 */
+  --ink:           #263645;   /* 本文墨 */
+  --ink-weak:      #607383;   /* 側注・キャプション */
+  --rule:          #bccbd7;   /* 細罫 */
   --warn:          #b3541e;
   --warn-weak:     #fdf1e7;
-  --code-bg:       #f6f7f9;
+  --code-bg:       #f4f6f8;
   --serif:  "Noto Serif CJK JP", "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --sans:   "Noto Sans CJK JP", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
   --mono:   "DejaVu Sans Mono", "Noto Sans Mono CJK JP", "Menlo", monospace;
@@ -78,7 +78,7 @@
 html {
   font-family: var(--serif);
   font-size: 9.8pt;
-  line-height: 1.85;
+  line-height: 1.95;
   color: var(--ink);
   text-align: justify;
   line-break: strict;
@@ -242,6 +242,7 @@ em { font-style: normal; font-weight: 700; color: var(--accent); }
 .ch-opener .ch-num::before { content: "CHAPTER " counter(chapter, decimal-leading-zero); }
 
 .ch-opener h1 {
+  color: var(--accent);
   font-family: var(--sans);
   font-size: 24pt;
   font-weight: 700;
@@ -278,8 +279,9 @@ em { font-style: normal; font-weight: 700; color: var(--accent); }
 /* ---------- 見出し ---------- */
 
 h2 {
+  color: var(--accent);
   font-family: var(--sans);
-  font-size: 14pt;
+  font-size: 16pt;
   font-weight: 700;
   line-height: 1.5;
   margin: 9mm 0 4mm;
@@ -304,6 +306,7 @@ h3 {
   margin: 6mm 0 2.5mm;
   padding-left: 3mm;
   border-left: 3pt solid var(--accent);
+  color: var(--accent);
   counter-increment: subsection;
   break-after: avoid;
   text-align: left;
@@ -369,6 +372,50 @@ h4 {
   font-weight: 700;
 }
 
+/* ---------- 図解のある教科書の本文 ---------- */
+
+/* 節の要旨はゴシック体、説明本文は明朝体で役割を分ける。 */
+.section-lead {
+  font-family: var(--sans);
+  font-size: 1.08em;
+  line-height: 1.8;
+  color: var(--ink-weak);
+  margin: 0 0 5mm;
+  text-indent: 0;
+}
+
+/* 注釈を使う段落だけ本文と二段にし、続く図・表には全幅を使える。 */
+.text-with-note {
+  display: flex;
+  gap: 5mm;
+  align-items: flex-start;
+  margin: 4mm 0;
+  break-inside: avoid;
+}
+.text-with-note > .note-body { flex: 1; min-width: 0; }
+.text-with-note > .note-body > :last-child { margin-bottom: 0; }
+.text-with-note > .sidenote {
+  float: none;
+  clear: none;
+  flex: 0 0 var(--sidenote-w);
+  width: var(--sidenote-w);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2.5mm 3mm;
+  border-left: none;
+  border-top: 1.2pt solid var(--accent);
+  background: var(--accent-weak);
+  font-size: 8pt;
+  line-height: 1.75;
+}
+
+/* 小さな判型で長い注釈を使うときは、本文の下へ回せる。 */
+.text-with-note.stacked { display: block; }
+.text-with-note.stacked > .sidenote { width: auto; margin-top: 3mm; }
+
+/* 図の余白はSVGのviewBox内で確保し、枠の内外で二重に余白を取らない。 */
+figure.fig > svg { display: block; }
+
 /* ---------- 囲み（POINT / 注意 / 補足） ---------- */
 
 .callout {
@@ -393,13 +440,15 @@ h4 {
 .callout > *:last-child { margin-bottom: 0; }
 .callout ul, .callout ol { margin: 0 0 0.6em; padding-left: 5mm; }
 
-/* POINT: 参考書の要点囲み。左に太帯 */
+/* POINT: 参考書の要点囲み。淡い金色と上下の細罫 */
 .point {
-  background: #fffaf0;
-  border: 0.8pt solid #e0a94a;
-  border-left: 3.5pt solid #e0a94a;
+  background: #faf6eb;
+  border: none;
+  border-top: 1pt solid #aa8643;
+  border-bottom: 0.5pt solid #decfab;
+  border-radius: 0;
 }
-.point > .co-title { color: #a86c12; }
+.point > .co-title { color: #806025; }
 .point > .co-title::before { content: "POINT  "; letter-spacing: 0.25em; }
 
 /* 注意 */
@@ -535,10 +584,12 @@ figure.code { margin: 4mm 0; break-inside: avoid; }
 figure.code > figcaption {
   font-family: var(--sans);
   font-size: 8.2pt;
-  color: #fff;
-  background: #3a4149;
-  padding: 1.2mm 3mm;
-  border-radius: 1.2mm 1.2mm 0 0;
+  color: var(--ink-weak);
+  background: transparent;
+  padding: 0 0 1.5mm;
+  margin-top: 0;
+  text-align: left;
+  border-radius: 0;
   text-indent: 0;
 }
 figure.code > figcaption .lang { float: right; opacity: 0.65; letter-spacing: 0.08em; }
@@ -559,7 +610,7 @@ pre {
   text-indent: 0;
   break-inside: avoid;
 }
-figure.code > pre { border-radius: 0 0 1.2mm 1.2mm; border-top: none; margin-bottom: 0; }
+figure.code > pre { border-radius: 0; margin-bottom: 0; }
 
 code {
   font-family: var(--mono);
@@ -629,16 +680,19 @@ caption::before {
 }
 thead { display: table-header-group; }
 th {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-weak);
+  color: var(--accent);
   font-weight: 700;
   text-align: left;
-  padding: 1.6mm 2.5mm;
-  border: 0.5pt solid var(--accent);
+  padding: 2.4mm 3mm;
+  border: none;
+  border-top: 1pt solid var(--accent);
+  border-bottom: 0.6pt solid var(--rule);
 }
 td {
-  padding: 1.6mm 2.5mm;
-  border: 0.5pt solid var(--rule);
+  padding: 2.4mm 3mm;
+  border: none;
+  border-bottom: 0.5pt solid var(--rule);
   vertical-align: top;
   text-align: left;
 }
@@ -765,6 +819,10 @@ dd { margin: 0 0 0 5mm; }
 
 /* 本文中の索引マーカーは表示に影響させない */
 .idx { }
+
+/* 教材の節を独立したページから始める場合だけ使う。本文量に応じた自然改ページは妨げない。 */
+.lesson { break-before: page; }
+.lesson > h2:first-child { margin-top: 0; }
 
 /* ---------- 汎用ユーティリティ ---------- */
 

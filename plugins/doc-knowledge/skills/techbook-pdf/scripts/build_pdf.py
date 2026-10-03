@@ -183,7 +183,7 @@ CODE_COLS = {"a4": 72, "b5": 60, "a5": 48}
 
 PRESETS = {
     "a4": dict(size="210mm 297mm", height="297mm", margin="22mm 48mm 20mm 24mm",
-               font="10.2pt", sidenote_w="34mm", sidenote_pull="40mm"),
+               font="10.5pt", sidenote_w="34mm", sidenote_pull="40mm"),
     "b5": dict(size="182mm 257mm", height="257mm", margin="20mm 42mm 18mm 22mm",
                font="9.8pt", sidenote_w="30mm", sidenote_pull="35mm"),
     "a5": dict(size="148mm 210mm", height="210mm", margin="16mm 34mm 15mm 17mm",
@@ -191,7 +191,7 @@ PRESETS = {
 }
 # 側注を使わない場合の左右対称マージン
 NARROW = {
-    "a4": "22mm 26mm 20mm 26mm",
+    "a4": "20mm 21mm 19mm 21mm",
     "b5": "20mm 22mm 18mm 22mm",
     "a5": "16mm 18mm 15mm 18mm",
 }
@@ -436,14 +436,14 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="本文HTML断片から参考書PDFを作る")
     ap.add_argument("input", help="本文のHTML断片（<section class='chapter'>の並び）")
     ap.add_argument("-o", "--output", default="book.pdf")
-    ap.add_argument("--preset", choices=list(PRESETS), default="b5")
+    ap.add_argument("--preset", choices=list(PRESETS), default="a4")
     ap.add_argument("--title", default="無題")
     ap.add_argument("--subtitle", default="")
     ap.add_argument("--author", default="", help="表紙の著者名。無ければ表紙下部ごと省かれる")
     ap.add_argument("--meta", default="", help="表紙下部の補足（版数・日付など）")
     ap.add_argument("--kicker", default="", help="表紙上部の小見出し")
-    ap.add_argument("--accent", default="#1b4f8a")
-    ap.add_argument("--accent-weak", default="#e8f0f9")
+    ap.add_argument("--accent", default="#244d78")
+    ap.add_argument("--accent-weak", default="#edf2f7")
     ap.add_argument("--toc-depth", type=int, default=2, choices=[1, 2, 3])
     ap.add_argument("--no-cover", action="store_true")
     ap.add_argument("--no-toc", action="store_true")

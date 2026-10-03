@@ -1,0 +1,259 @@
+<!-- 図解を添えた教科書の完成例。本文HTML断片として build_pdf.py に渡す。
+標準: --preset a4 --no-sidenotes。フォント・番号・目次・索引はビルダーに任せる。
+A5等では図のラベルを大きくして図を分割し、text-with-note stacked を使う。 -->
+<section class="chapter">
+<header class="ch-opener">
+<p class="ch-num">
+</p>
+<h1>コンテナの基本</h1>
+<div class="goals">
+<p class="goals-title">この章で学ぶこと</p>
+<ul>
+<li>イメージとコンテナの違いを説明する</li>
+<li>ホストとコンテナのポートの対応を読む</li>
+<li>イメージを共有して別の場所で起動する流れを追う</li>
+</ul>
+</div>
+</header>
+<section class="lesson">
+<h2 id="image-container">イメージとコンテナ</h2>
+<p class="section-lead">実行のもとと、実行する環境を区別する。</p>
+<div class="text-with-note">
+<div class="note-body">
+<p>アプリを動かすには、プログラムだけでなく、実行環境や必要なファイルも揃える必要があります。これらをまとめたものが、<strong>
+<span class="idx" data-term="イメージ" data-yomi="イメージ">イメージ（Image）</span>
+</strong>です。</p>
+<p>イメージをもとに作られる実行環境を、<strong>
+<span class="idx" data-term="コンテナ" data-yomi="コンテナ">コンテナ（Container）</span>
+</strong>と呼びます。同じイメージから、複数のコンテナを起動できます。</p>
+</div>
+<aside class="sidenote">
+<span class="sn-label">用語の補足</span>
+<p>イメージは実行のもとになるもの。コンテナは、そのイメージから作る個々の実行環境です。</p>
+</aside>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 600 172" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#edf2f7" height="170" rx="10" width="598" x="1" y="1">
+</rect>
+<rect fill="#284f74" height="64" rx="7" width="137" x="22" y="57">
+</rect>
+<text fill="white" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="14" text-anchor="middle" x="90" y="83">ソースコード</text>
+<text fill="#c5dce5" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="90" y="105">アプリ + Dockerfile</text>
+<path d="M159 90H218" stroke="#244d78" stroke-width="2">
+</path>
+<path d="M218 90l-8 -4v8z" fill="#244d78">
+</path>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="187" y="73">① build</text>
+<rect fill="#edf2f7" height="64" rx="7" stroke="#a5cbd4" width="145" x="218" y="57">
+</rect>
+<text fill="#284f74" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="14" text-anchor="middle" x="290" y="83">イメージ</text>
+<text fill="#466676" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="290" y="105">my-app:v1</text>
+<path d="M363 90H392V49H432M392 90v42h40" fill="none" stroke="#244d78" stroke-width="2">
+</path>
+<path d="M432 49l-8 -4v8zM432 132l-8 -4v8z" fill="#244d78">
+</path>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="392" y="24">② run</text>
+<rect fill="white" height="47" rx="7" stroke="#a5cbd4" width="146" x="432" y="26">
+</rect>
+<rect fill="white" height="47" rx="7" stroke="#a5cbd4" width="146" x="432" y="109">
+</rect>
+<text fill="#284f74" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="505" y="55">コンテナ A</text>
+<text fill="#284f74" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="505" y="138">コンテナ B</text>
+</svg>
+<figcaption>1つのイメージから、複数のコンテナを起動できる</figcaption>
+</figure>
+<h3>操作を、対象と結び付ける</h3>
+<p>コマンドは「何をもとに、何をするか」で整理できます。イメージを作る操作と、コンテナを起動する操作は別です。</p>
+<table>
+<caption>コマンドと操作する対象</caption>
+<thead>
+<tr>
+<th style="width:23%">コマンド</th>
+<th style="width:39%">対象</th>
+<th>結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>docker build</code>
+</td>
+<td>ソースと Dockerfile</td>
+<td>イメージを作る</td>
+</tr>
+<tr>
+<td>
+<code>docker run</code>
+</td>
+<td>イメージ</td>
+<td>コンテナを作って起動</td>
+</tr>
+<tr>
+<td>
+<code>docker push</code>
+</td>
+<td>イメージ</td>
+<td>レジストリへ送る</td>
+</tr>
+</tbody>
+</table>
+<div class="callout point">
+<p class="co-title">送るのは、イメージ</p>
+<p>別の場所でアプリを動かすときは、イメージを共有し、その場所で新しいコンテナを起動します。動いているコンテナそのものを送るわけではありません。</p>
+</div>
+</section>
+<section class="lesson">
+<h2 id="publish-port">ポートを公開して接続する</h2>
+<p class="section-lead">「動いている」と「接続できる」は、別の確認。</p>
+<p>コンテナ内でアプリが動いていても、ホストから接続できるとは限りません。ホスト側のポートとコンテナ側のポートを対応付けて、接続先を用意します。</p>
+<figure class="fig">
+<svg viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#edf2f7" height="138" rx="8" width="598" x="1" y="1">
+</rect>
+<rect fill="white" height="90" rx="6" stroke="#abc5d0" width="202" x="20" y="28">
+</rect>
+<rect fill="white" height="90" rx="6" stroke="#abc5d0" width="202" x="378" y="28">
+</rect>
+<text fill="#284959" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="121" y="53">ホスト側</text>
+<text fill="#284f74" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="15" text-anchor="middle" x="121" y="82">127.0.0.1:8080</text>
+<text fill="#63818a" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="121" y="103">ブラウザ・curl の接続先</text>
+<path d="M222 76H378" stroke="#244d78" stroke-width="2">
+</path>
+<path d="M378 76l-9 -5v10z" fill="#244d78">
+</path>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="12" text-anchor="middle" x="300" y="61">-p で対応付け</text>
+<text fill="#284959" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="479" y="53">コンテナ側</text>
+<text fill="#284f74" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="15" text-anchor="middle" x="479" y="82">8080</text>
+<text fill="#63818a" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="479" y="103">アプリの待ち受けポート</text>
+</svg>
+<figcaption>ホストのローカルアドレスから、コンテナ内のアプリへ接続する</figcaption>
+</figure>
+<h3>起動コマンドを読む</h3>
+<figure class="code">
+<figcaption>ローカル接続用のポートを公開して起動</figcaption>
+<pre>
+<code class="language-bash">docker run -d --name demo \
+  -p 127.0.0.1:8080:8080 my-app:v1</code>
+</pre>
+</figure>
+<p>
+<code>my-app:v1</code> は使用するイメージ、<code>demo</code> はコンテナの名前です。<code>-p</code> の指定は、ホスト側のアドレス、ホスト側のポート、コンテナ側のポートの順に並びます。</p>
+<table>
+<caption>ポートに関する設定の違い</caption>
+<thead>
+<tr>
+<th style="width:32%">設定</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>
+<span class="idx" data-term="EXPOSE" data-yomi="EXPOSE">EXPOSE</span>
+</code>
+</td>
+<td>アプリが使用するポートの情報を示す</td>
+</tr>
+<tr>
+<td>
+<code>docker run -p</code>
+</td>
+<td>ホスト側とコンテナ側のポートを対応付けて公開する</td>
+</tr>
+</tbody>
+</table>
+<div class="callout point">
+<p class="co-title">情報と公開設定を区別する</p>
+<p>Dockerfile に <code>EXPOSE</code> を記述しただけでは、ホスト側へのポート公開は行われません。実際の公開には <code>-p</code> などの指定が必要です。</p>
+</div>
+<p class="small">前提：イメージは作成済み。アプリはコンテナ内の 0.0.0.0:8080 で待ち受けます。掲載例は実行未検証です。</p>
+</section>
+<section class="lesson">
+<h2 id="share-image">イメージを共有して動かす</h2>
+<p class="section-lead">同じアプリを、別の場所で新しく起動する。</p>
+<div class="text-with-note">
+<div class="note-body">
+<p>ローカルで作ったアプリを別の場所で動かすときは、イメージをレジストリへ送ります。配備先では、そのイメージを取得し、新しいコンテナを起動します。</p>
+<p>この流れを「作成」「保存・共有」「起動」に分けると、どの対象がどこへ渡るのかを整理できます。</p>
+</div>
+<aside class="sidenote">
+<span class="sn-label">レジストリとは</span>
+<p>イメージを保管して共有する場所です。Google Cloud では Artifact Registry などを利用します。</p>
+</aside>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 600 230" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#f3f7fa" height="224" rx="8" width="596" x="2" y="2">
+</rect>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" x="20" y="24">ローカル：イメージを作成して共有する</text>
+<rect fill="#244d78" height="54" rx="6" width="146" x="20" y="42">
+</rect>
+<text fill="white" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="14" text-anchor="middle" x="93" y="65">ソースコード</text>
+<text fill="#d9e6ef" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="10" text-anchor="middle" x="93" y="83">アプリ + Dockerfile</text>
+<path d="M166 69H226" stroke="#244d78" stroke-width="2">
+</path>
+<path d="M226 69l-8 -4v8z" fill="#244d78">
+</path>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="196" y="52">① build</text>
+<rect fill="white" height="54" rx="6" stroke="#9bb6cd" width="146" x="226" y="42">
+</rect>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="14" text-anchor="middle" x="299" y="65">イメージ</text>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="10" text-anchor="middle" x="299" y="83">実行に必要なファイル</text>
+<path d="M372 69H432" stroke="#244d78" stroke-width="2">
+</path>
+<path d="M432 69l-8 -4v8z" fill="#244d78">
+</path>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="402" y="52">② push</text>
+<rect fill="#e4edf5" height="54" rx="6" stroke="#9bb6cd" width="146" x="432" y="42">
+</rect>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="14" text-anchor="middle" x="505" y="65">レジストリ</text>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="10" text-anchor="middle" x="505" y="83">イメージの保管場所</text>
+<path d="M505 96V142" stroke="#244d78" stroke-width="2">
+</path>
+<path d="M505 142l-4 -8h8z" fill="#244d78">
+</path>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="end" x="487" y="122">③ 配備先がイメージを取得</text>
+<rect fill="white" height="58" rx="6" stroke="#9bb6cd" width="146" x="20" y="146">
+</rect>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="93" y="171">ローカルのコンテナ</text>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="10" text-anchor="middle" x="93" y="191">こちらは移動しない</text>
+<path d="M299 96V174H166" fill="none" stroke="#829fb7" stroke-width="1.5">
+</path>
+<path d="M166 174l8 -4v8z" fill="#829fb7">
+</path>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="10" text-anchor="end" x="270" y="139">ローカルで起動</text>
+<rect fill="#244d78" height="58" rx="6" width="232" x="346" y="146">
+</rect>
+<text fill="white" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="462" y="171">配備先のコンテナ</text>
+<text fill="#d9e6ef" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="10" text-anchor="middle" x="462" y="191">取得したイメージから新しく起動</text>
+</svg>
+<figcaption>イメージの流れと、ローカル・配備先の実行環境</figcaption>
+</figure>
+<h3>実行環境は、それぞれ独立する</h3>
+<p>同じイメージを使っていても、コンテナは別々の実行環境です。一方を停止したという理由だけで、もう一方も停止するわけではありません。</p>
+<figure class="fig">
+<svg viewBox="0 0 600 125" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#faf8f0" height="122" rx="7" width="598" x="1" y="1">
+</rect>
+<text fill="#806025" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" x="20" y="23">イメージが同じでも、実行中の状態は別々</text>
+<rect fill="white" height="62" rx="5" stroke="#c8b98e" width="248" x="20" y="40">
+</rect>
+<rect fill="white" height="62" rx="5" stroke="#c8b98e" width="248" x="332" y="40">
+</rect>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="144" y="65">コンテナ A</text>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="144" y="87">停止する</text>
+<text fill="#244d78" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="13" text-anchor="middle" x="456" y="65">コンテナ B</text>
+<text fill="#607383" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-size="11" text-anchor="middle" x="456" y="87">それだけでは停止しない</text>
+<path d="M300 43V101" stroke="#c8b98e" stroke-dasharray="3 3" stroke-width="1">
+</path>
+</svg>
+<figcaption>同じイメージから作ったコンテナでも、実行状態はそれぞれ別</figcaption>
+</figure>
+<div class="callout point">
+<p class="co-title">共有するものと、別々に動くもの</p>
+<p>共有するのはイメージです。コンテナは各環境で作って動かします。基本の関係は<a class="xref" href="#image-container"></a>を参照してください。</p>
+</div>
+</section>
+</section>
