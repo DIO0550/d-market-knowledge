@@ -3,19 +3,23 @@
   dev-knowledge ナレッジ記事テンプレート（HTML 版・オプション）
 
   - 基本は Markdown（article-format.md）。ユーザーが「HTML で」と明示したときだけ使う。
-  - 構成は md 版と同一: タグ → タイトル → TL;DR → 遭遇した問題 → 原因 → 解決 → まとめ → 参考。
-  - 中身のルールも md 版と同じ（1記事1トピック / tags 必須 / 日本語 / 最小コード）。
+  - 外枠は md 版と同一: タグ → タイトル → TL;DR → 本論 →（まとめ）→ 参考。
+    - 型 A（トラブル型）: 遭遇した問題 → 原因 → 解決
+    - 型 B（設計判断・比較型）: 背景・射程 → 判断軸・比較 → 指針
+    - 型 C（技術解説・仕組み型）: 概要・対象 → 仕組み・仕様 → 使いどころ・注意点
+  - 短い記事（目安 100 行未満）では「まとめ」を省略し TL;DR に集約してよい。
+  - タグは小文字英語ケバブケース、目安 3〜6 個。中身のルール（1記事1トピック / 常体日本語 / 最小コード / 汎用化）も md 版と同じ。
   - <…> の箇所を差し替えて使う。
   - アクセント色は :root の --accent を変える。プリセット: #2563eb（青）/ #0d9488（teal）/ #d97757（橙）/ #7c3aed（紫）
-  - 不要なら .meta（メタ情報）/ .toc（目次）のブロックは丸ごと削除してよい。
+  - 不要なら .meta（メタ情報）/ .toc（目次）/ #summary（まとめ）のブロックは丸ごと削除してよい。
 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- title / tags は横断検索の手がかり。必ず残す -->
+  <!-- title はプレーンテキスト、keywords は小文字英語ケバブケース（3〜6個目安） -->
   <title><タイトル></title>
-  <meta name="keywords" content="<tag1>, <tag2>, <tag3>">
+  <meta name="keywords" content="<tag-1>, <tag-2>, <tag-3>">
   <meta name="description" content="<一行サマリ>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,38 +167,38 @@
         </div>
       </section>
 
-      <!-- 遭遇した問題（設計知見系なら「このドキュメントの射程」等に置き換え可） -->
+      <!-- 本論1: 型A「遭遇した問題」 / 型B「背景・射程」 / 型C「概要・対象」 -->
       <section id="problem" class="section">
         <div class="section-head">
           <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg></span>
           <h2 class="h2">遭遇した問題</h2>
         </div>
         <ul class="list">
-          <li><何が起きたか。></li>
-          <li><再現条件。></li>
+          <li><何が起きたか / どんな判断を扱うか / 何の機能・仕様か。></li>
+          <li><再現条件 / 対象外 / 導入された背景。></li>
           <li>環境: <バージョン等>。</li>
         </ul>
       </section>
 
-      <!-- 原因 -->
+      <!-- 本論2: 型A「原因」 / 型B「判断軸・比較」 / 型C「仕組み・仕様」 -->
       <section id="cause" class="section">
         <div class="section-head">
           <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
           <h2 class="h2">原因</h2>
         </div>
         <ul class="list">
-          <li><なぜそうなるか。></li>
+          <li><なぜそうなるか / 選択肢の比較 / 内部動作・ルール・制限。></li>
         </ul>
       </section>
 
-      <!-- 解決 -->
+      <!-- 本論3: 型A「解決」 / 型B「指針」 / 型C「使いどころ・注意点」 -->
       <section id="solution" class="section">
         <div class="section-head">
           <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
           <h2 class="h2">解決</h2>
         </div>
         <ul class="list">
-          <li><どう直したか / どう設計したか。></li>
+          <li><どう直したか / 実務でどう選び分けるか / 使い分け・ハマりどころ。></li>
         </ul>
 
         <!-- NG 例（任意。コピーボタンは vanilla JS で動作） -->
@@ -224,7 +228,7 @@
         </div>
       </section>
 
-      <!-- まとめ -->
+      <!-- まとめ（短い記事なら省略し TL;DR に集約してよい） -->
       <section id="summary" class="section">
         <div class="section-head">
           <span class="section-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
