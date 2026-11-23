@@ -16,13 +16,13 @@ description: 明朝体の本文・紺色の見出しと豊富な図解を組み�
    フロー図・攻撃フロー図、および人物／攻撃者／サーバ等のアイコン集）は
    [references/diagrams.md](references/diagrams.md)。
 3. **ビルドする** — 下記コマンド。警告が出たら潰す。
-4. **必ず目視確認する** — `pdftoppm -png -r 80 book.pdf pg` で画像化し、最低でも表紙・目次・本文・索引の4枚を `view` で見る。組版は見ないと崩れに気づけない。
+4. **必ず目視確認する** — `pdftoppm -png -r 80 book.pdf pg` で画像化し、最低でも表紙・目次・本文・索引の4枚を `Read` で見る。組版は見ないと崩れに気づけない。
 5. **成果物を渡す** — PDFを作業ディレクトリに出力し、ファイルパスをユーザーに伝える。
 
 ## ビルド
 
 ```bash
-python3 scripts/build_pdf.py content.html -o book.pdf \
+python3 "${CLAUDE_SKILL_DIR}/scripts/build_pdf.py" content.html -o book.pdf \
   --preset a4 --no-sidenotes \
   --title "実践Webプロトコル入門" \
   --subtitle "HTTPからTLSまで、手を動かして理解する" \
@@ -60,7 +60,7 @@ python3 scripts/build_pdf.py content.html -o book.pdf \
 見本のHTMLや共通CSSを変更した場合は、見本PDFも再生成して目視確認する。
 
 ```bash
-python3 scripts/build_pdf.py templates/textbook-sample.html -o textbook.pdf \
+python3 "${CLAUDE_SKILL_DIR}/scripts/build_pdf.py" "${CLAUDE_SKILL_DIR}/templates/textbook-sample.html" -o textbook.pdf \
   --preset a4 --no-sidenotes --title "コンテナの基本" --keep-html
 ```
 
@@ -70,11 +70,11 @@ WeasyPrint / BeautifulSoup / Pygments に依存するが、**スクリプトは�
 不足していればコマンドを示して停止するので、初回だけ次を実行する。
 
 ```bash
-python3 scripts/build_pdf.py --install-deps content.html -o book.pdf --preset b5 --title "…"
+python3 "${CLAUDE_SKILL_DIR}/scripts/build_pdf.py" --install-deps content.html -o book.pdf --preset b5 --title "…"
 ```
 
-`scripts/requirements.lock.txt` に全17パッケージのバージョンと sha256 が固定してあり、
-これを `--require-hashes` 付きで `scripts/.venv` に導入する。導入先はこの venv だけで、
+`${CLAUDE_SKILL_DIR}/scripts/requirements.lock.txt` に全17パッケージのバージョンと sha256 が固定してあり、
+これを `--require-hashes` 付きで `${CLAUDE_SKILL_DIR}/scripts/.venv` に導入する。導入先はこの venv だけで、
 システムの Python には書き込まない。2回目以降は自動で venv 側に切り替わるので指定不要。
 
 ハッシュ不一致で失敗したら**取り込まずに止める**。配布物がすり替わった可能性がある。
@@ -95,7 +95,7 @@ python3 scripts/build_pdf.py --install-deps content.html -o book.pdf --preset b5
 
 ### 更新する場合の手順
 
-`python3 scripts/update_lock.py` で作り直し、**バージョンとハッシュの差分を必ずレビューして**
+`python3 "${CLAUDE_SKILL_DIR}/scripts/update_lock.py"` で作り直し、**バージョンとハッシュの差分を必ずレビューして**
 からコミットする。`update_lock.py` は**最新版を選ばない**。公開から14日を過ぎた版のうち
 最も新しいものを採る（`--min-age` で変更可）。リリースが乗っ取られた場合、発覚するのは
 公開から数日後になるため、最新版を追うとその窓に自分から入ることになる。
@@ -105,7 +105,7 @@ python3 scripts/build_pdf.py --install-deps content.html -o book.pdf --preset b5
 ```bash
 # マルウェア判定（Aikido Intel。pip も対象）
 npm install -g @aikidosec/safe-chain && safe-chain setup-ci
-pip install -r scripts/requirements.lock.txt --require-hashes --only-binary :all: --no-deps
+pip install -r "${CLAUDE_SKILL_DIR}/scripts/requirements.lock.txt" --require-hashes --only-binary :all: --no-deps
 
 # 既知の脆弱性・悪性パッケージ報告（OSV は MAL- として悪性パッケージも収録している）
 curl -s -X POST https://api.osv.dev/v1/querybatch -d '{"queries":[…]}'

@@ -94,7 +94,7 @@ description: "会話セッション（現在の会話、または今までの会
 
 ### Step 4: 選ばれた候補を 1 件ずつ起票する
 
-ユーザーが選んだ各候補は **1 トピック = 1 issue** で `dio0550/dev-knowledge` に起票する。起票の手順・ラベル運用・`gh` が使えない環境での代替（GitHub MCP）はすべて `knowledge-issue` スキルに従う。そちらの本文テンプレートを各候補に当てはめる。
+ユーザーが選んだ各候補は **1 トピック = 1 issue** で `dio0550/dev-knowledge` に起票する。起票の手順・ラベル運用・`gh` が使えない環境での代替（GitHub MCP）はすべて `knowledge-issue` スキルに従う。**`knowledge-issue` には `disable-model-invocation: true` が設定されており `Skill` ツールで起動できないため、`${CLAUDE_PLUGIN_ROOT}/skills/knowledge-issue/SKILL.md` を `Read` ツールで読み込み、記載された起票ルール・コマンド・本文テンプレートを各候補に適用する。**
 
 - 情報が十分（`knowledge:direct`）で内容が揃っているものは、先に `knowledge-article` で記事化してから「A. 記事を登録」で起票してもよい。
 - 情報不足（`knowledge:pr`）のものは「B. 開発中の疑問・設計メモを起票する」テンプレートで、調べたいこと・仮説を残して起票する。
@@ -110,7 +110,7 @@ description: "会話セッション（現在の会話、または今までの会
 
 | スキル | 役割 | このスキルとの関係 |
 |---|---|---|
-| `knowledge-issue` | 1 件を dev-knowledge の issue に起票 | Step 4 の起票メカニクスを委譲する先 |
+| `knowledge-issue` | 1 件を dev-knowledge の issue に起票 | Step 4 の起票ルール・テンプレート参照先（`Read` で `${CLAUDE_PLUGIN_ROOT}/skills/knowledge-issue/SKILL.md` を読み込んで適用） |
 | `knowledge-article` | 知見を frontmatter 付き md 記事にする | 情報十分な候補を記事化してから起票する場合に使う |
 
 ## 前提条件
